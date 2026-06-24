@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TutorFlow - Personal AI Tutor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="TutorFlow home">
+        <span class="brand-mark">T</span>
+        <span>TutorFlow</span>
+      </a>
+      <nav aria-label="Main navigation">
+        <button class="nav-item active" data-view="dashboard"><span>01</span> Overview</button>
+        <button class="nav-item" data-view="tutor"><span>02</span> AI Tutor</button>
+        <button class="nav-item" data-view="assessment"><span>03</span> Practice</button>
+        <button class="nav-item" data-view="plan"><span>04</span> Study Plan</button>
+      </nav>
+      <div class="semester-card">
+        <p class="eyebrow">SPRING SEMESTER</p>
+        <strong>68% complete</strong>
+        <div class="progress"><span style="width:68%"></span></div>
+        <small>Week 11 of 16</small>
+      </div>
+      <div class="profile">
+        <div class="avatar">VT</div>
+        <div><strong>Vuong Thuan</strong><small>Computer Science</small></div>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PERSONAL LEARNING SPACE</p>
+          <h1 id="page-title">Good afternoon, Thuan</h1>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" id="reset-demo" title="Reset demo">↻</button>
+          <button class="notification" aria-label="Notifications">3</button>
+        </div>
+      </header>
+
+      <section class="view active" id="dashboard">
+        <div class="alert-card">
+          <div class="alert-icon">!</div>
+          <div>
+            <p class="eyebrow">PROGRESS MONITOR ALERT</p>
+            <h2>Integration by parts needs attention</h2>
+            <p>Your recent score dropped 18% below your Calculus II average. A focused 12-minute session can help.</p>
+          </div>
+          <button class="primary" data-open-tutor>Start tutoring</button>
+        </div>
+
+        <div class="stat-grid">
+          <article class="stat"><p>Course average</p><strong>78.4%</strong><span class="positive">+2.3% this month</span></article>
+          <article class="stat"><p>Topics mastered</p><strong>24 / 31</strong><span>4 in progress</span></article>
+          <article class="stat"><p>Study streak</p><strong>8 days</strong><span>Personal best: 12</span></article>
+          <article class="stat"><p>Next deadline</p><strong>2 days</strong><span>Calculus problem set</span></article>
+        </div>
+
+        <div class="content-grid">
+          <article class="panel progress-panel">
+            <div class="panel-heading"><div><p class="eyebrow">LEARNING ANALYTICS</p><h2>Course progress</h2></div><span class="chip">Live profile</span></div>
+            <div class="course-row"><div><strong>Data Structures</strong><small>9 of 11 topics mastered</small></div><div class="course-score">86%</div><div class="progress"><span style="width:86%"></span></div></div>
+            <div class="course-row"><div><strong>Calculus II</strong><small>Weak: integration by parts</small></div><div class="course-score warning">64%</div><div class="progress warning-bar"><span style="width:64%"></span></div></div>
+            <div class="course-row"><div><strong>Database Systems</strong><small>7 of 9 topics mastered</small></div><div class="course-score">82%</div><div class="progress"><span style="width:82%"></span></div></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">NEXT UP</p><h2>This week</h2></div><button class="text-button" data-view-button="plan">View plan</button></div>
+            <div class="task"><span class="date">07<br><small>JUN</small></span><div><strong>Calculus problem set</strong><small>Due in 2 days · High priority</small></div></div>
+            <div class="task"><span class="date">09<br><small>JUN</small></span><div><strong>Binary tree practice</strong><small>25 min · Adaptive quiz</small></div></div>
+            <div class="task"><span class="date">11<br><small>JUN</small></span><div><strong>Database midterm</strong><small>3 topics to review</small></div></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="tutor">
+        <div class="tutor-layout">
+          <article class="panel tutor-info">
+            <p class="eyebrow">CURRENT CONTEXT</p>
+            <h2>Calculus II</h2>
+            <div class="topic-score"><span>Topic confidence</span><strong id="confidence">46%</strong></div>
+            <div class="progress warning-bar"><span id="confidence-bar" style="width:46%"></span></div>
+            <h3>Retrieved sources</h3>
+            <div class="source-card"><strong>Lecture 08</strong><small>Integration techniques · pp. 12–15</small></div>
+            <div class="source-card"><strong>Calculus Textbook</strong><small>Chapter 7.1 · Integration by parts</small></div>
+            <button class="secondary full" id="quiz-from-chat">Quiz me on this topic</button>
+          </article>
+
+          <article class="chat-card">
+            <div class="chat-header"><div><span class="online-dot"></span><strong>Tutor Agent</strong><small>Grounded in your course materials</small></div><span class="chip">RAG active</span></div>
+            <div class="messages" id="messages" aria-live="polite">
+              <div class="message tutor-message">
+                <span class="bot-avatar">AI</span>
+                <div><p>I noticed integration by parts has been difficult recently. Would you like a quick explanation, a worked example, or a hint-first exercise?</p><button class="citation">[1] Lecture 08, p. 12</button></div>
+              </div>
+            </div>
+            <div class="quick-prompts">
+              <button>Explain simply</button><button>Show an example</button><button>Give me a hint</button>
+            </div>
+            <form class="chat-input" id="chat-form">
+              <label class="sr-only" for="chat-text">Ask the tutor</label>
+              <input id="chat-text" autocomplete="off" placeholder="Ask about integration by parts..." required>
+              <button class="send" type="submit">Send</button>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="assessment">
+        <div class="assessment-wrap">
+          <div class="section-intro"><p class="eyebrow">ASSESSMENT AGENT</p><h2>Adaptive practice</h2><p>The next question changes based on your answer. Explanations use the same course sources as your tutor.</p></div>
+          <article class="quiz-card" id="quiz-card">
+            <div class="quiz-meta"><span class="chip" id="difficulty">Level 1 · Foundation</span><span>Question <b id="question-number">1</b> of 3</span></div>
+            <h2 id="quiz-question">For ∫x cos(x) dx, which choice correctly assigns u and dv?</h2>
+            <div class="answers" id="answers">
+              <button data-answer="wrong">u = cos(x), dv = x dx</button>
+              <button data-answer="correct">u = x, dv = cos(x) dx</button>
+              <button data-answer="wrong">u = x cos(x), dv = dx</button>
+              <button data-answer="wrong">u = 1, dv = x cos(x) dx</button>
+            </div>
+            <div class="feedback hidden" id="feedback"></div>
+            <button class="primary hidden" id="next-question">Next question</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="plan">
+        <div class="section-intro"><p class="eyebrow">CURRICULUM PLANNER AGENT</p><h2>Your prioritized week</h2><p>Generated from weak topics, deadlines, and 4.5 available study hours.</p></div>
+        <div class="week-grid">
+          <article class="day-card priority"><p>MON · JUN 08</p><h3>Integration by parts</h3><span>35 min · Calculus II</span><div class="tag">Priority: High</div><small>Review concept → 2 worked examples → 5-question quiz</small></article>
+          <article class="day-card"><p>TUE · JUN 09</p><h3>Binary search trees</h3><span>30 min · Data Structures</span><div class="tag">Practice</div><small>Traversal recap → adaptive coding questions</small></article>
+          <article class="day-card"><p>WED · JUN 10</p><h3>Normalization</h3><span>45 min · Databases</span><div class="tag">Exam prep</div><small>Functional dependencies → 3NF exercises</small></article>
+          <article class="day-card"><p>THU · JUN 11</p><h3>Mixed review</h3><span>25 min · Calculus II</span><div class="tag">Reinforce</div><small>Spaced review based on Monday's quiz result</small></article>
+        </div>
+        <article class="panel rationale"><p class="eyebrow">WHY THIS PLAN?</p><p><strong>Calculus receives first priority</strong> because the topic score fell below 60% and an assignment is due in two days. Database review is scheduled before the midterm, while strong Data Structures performance requires only maintenance practice.</p></article>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
