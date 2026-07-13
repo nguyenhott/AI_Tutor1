@@ -10,11 +10,12 @@
   --shadow: 0 18px 50px rgba(32, 48, 39, .08);
 }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: Inter, "Segoe UI", Arial, sans-serif; color: var(--ink); background: var(--paper); }
-button, input { font: inherit; }
+html { height: 100%; }
+body { min-height: 100%; margin: 0; font-family: Inter, "Segoe UI", Arial, sans-serif; color: var(--ink); background: var(--paper); }
+button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
-.app-shell { min-height: 100vh; display: grid; grid-template-columns: 230px 1fr; }
-.sidebar { position: sticky; top: 0; height: 100vh; background: #173f32; color: white; padding: 28px 20px; display: flex; flex-direction: column; }
+.app-shell { min-height: 100vh; display: grid; grid-template-columns: 230px minmax(0, 1fr); }
+.sidebar { position: sticky; top: 0; height: 100vh; background: #173f32; color: white; padding: 28px 20px; display: flex; flex-direction: column; overflow-y: auto; }
 .brand { color: white; text-decoration: none; display: flex; gap: 11px; align-items: center; font-weight: 800; font-size: 20px; margin-bottom: 44px; }
 .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: var(--lime); color: #173f32; }
 nav { display: grid; gap: 8px; }
@@ -26,7 +27,7 @@ nav { display: grid; gap: 8px; }
 .profile { display: flex; gap: 10px; align-items: center; padding-top: 24px; margin-top: 24px; border-top: 1px solid rgba(255,255,255,.12); }
 .profile small, .chat-header small { display: block; color: #aebdb7; margin-top: 3px; }
 .avatar { width: 38px; height: 38px; display: grid; place-items: center; background: #f0b777; color: #3d2c1d; border-radius: 50%; font-weight: 800; }
-main { padding: 0 42px 50px; overflow: hidden; }
+main { min-width: 0; padding: 0 42px 50px; overflow: visible; }
 .topbar { min-height: 122px; display: flex; align-items: center; justify-content: space-between; }
 .topbar h1 { margin: 3px 0 0; font-size: 30px; }
 .eyebrow { color: var(--green); font-weight: 800; font-size: 11px; letter-spacing: 1.4px; margin: 0 0 6px; }
@@ -34,7 +35,7 @@ main { padding: 0 42px 50px; overflow: hidden; }
 .icon-button, .notification { width: 42px; height: 42px; border: 1px solid var(--line); background: var(--white); border-radius: 12px; }
 .notification { background: var(--ink); color: white; border: 0; }
 .view { display: none; animation: enter .28s ease; }
-.view.active { display: block; }
+.view.active { display: block; min-width: 0; }
 @keyframes enter { from { opacity: 0; transform: translateY(5px); } }
 .alert-card { background: #214f3f; color: white; border-radius: 18px; padding: 24px 26px; display: grid; grid-template-columns: 50px 1fr auto; gap: 18px; align-items: center; box-shadow: var(--shadow); }
 .alert-card .eyebrow { color: var(--lime); }
@@ -57,7 +58,7 @@ main { padding: 0 42px 50px; overflow: hidden; }
 .panel-heading h2, .section-intro h2 { margin: 0; }
 .chip, .tag { background: #edf1e9; color: var(--green); border-radius: 999px; padding: 6px 10px; font-size: 11px; font-weight: 800; }
 .course-row { display: grid; grid-template-columns: 1fr auto; gap: 7px 14px; padding: 15px 0; border-top: 1px solid #edf0e9; }
-.course-row small, .task small, .source-card small { display: block; color: var(--muted); margin-top: 5px; }
+.course-row small, .task small, .source-card small, .tutor-info > small { display: block; color: var(--muted); margin-top: 5px; }
 .course-row .progress { grid-column: 1 / 3; }
 .progress { height: 6px; overflow: hidden; background: #e9ede6; border-radius: 999px; }
 .progress span { display: block; height: 100%; background: var(--green); border-radius: inherit; transition: width .4s; }
@@ -67,16 +68,32 @@ main { padding: 0 42px 50px; overflow: hidden; }
 .date { min-width: 48px; border: 1px solid var(--line); border-radius: 10px; text-align: center; padding: 7px; font-weight: 900; line-height: 1; }
 .date small { font-size: 8px; }
 .text-button { border: 0; background: transparent; color: var(--green); font-weight: 800; }
-.tutor-layout { display: grid; grid-template-columns: 280px 1fr; gap: 18px; height: calc(100vh - 155px); min-height: 590px; }
+.tutor-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 18px; align-items: stretch; min-height: min(720px, calc(100vh - 155px)); }
 .tutor-info h2 { margin-top: 4px; }
 .tutor-info h3 { margin-top: 30px; font-size: 13px; }
+.tutor-info { max-height: calc(100vh - 155px); overflow-y: auto; }
 .topic-score { display: flex; justify-content: space-between; margin: 24px 0 8px; }
+.context-form { display: grid; gap: 10px; margin-top: 22px; padding-top: 18px; border-top: 1px solid #edf0e9; }
+.context-form label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 800; }
+.context-form input { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; color: var(--ink); outline-color: var(--green); }
+.new-chat-button { width: 100%; text-align: center; margin-top: 10px; padding: 8px; }
 .source-card { border: 1px solid var(--line); padding: 12px; border-radius: 10px; margin: 9px 0; }
-.chat-card { display: flex; flex-direction: column; overflow: hidden; }
+.document-card { display: grid; gap: 8px; }
+.document-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.practice-document, .delete-document { width: fit-content; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 800; }
+.practice-document { border: 1px solid #cfe5d2; background: #f4faf2; color: var(--green); }
+.delete-document { border: 1px solid #f1c7b8; background: #fff0eb; color: var(--orange); }
+.delete-document:hover { border-color: var(--orange); }
+.session-list { display: grid; gap: 9px; margin: 9px 0; }
+.session-card { width: 100%; border: 1px solid var(--line); background: #fbfcf8; color: var(--ink); border-radius: 10px; padding: 12px; text-align: left; }
+.session-card strong, .session-card small { display: block; }
+.session-card small { color: var(--muted); margin-top: 5px; line-height: 1.35; }
+.session-card:hover, .session-card.active { border-color: var(--green); background: #eff4eb; }
+.chat-card { display: flex; flex-direction: column; min-width: 0; min-height: min(680px, calc(100vh - 155px)); overflow: hidden; }
 .chat-header { padding: 18px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; }
 .online-dot { display: inline-block; width: 8px; height: 8px; background: #3ab879; border-radius: 50%; margin-right: 8px; }
-.messages { flex: 1; overflow: auto; padding: 24px; background: #fbfcf8; }
-.message { display: flex; gap: 10px; margin-bottom: 17px; max-width: 78%; line-height: 1.55; }
+.messages { flex: 1 1 auto; min-height: 260px; overflow: auto; padding: 24px; background: #fbfcf8; }
+.message { display: flex; gap: 10px; margin-bottom: 17px; max-width: min(78%, 920px); line-height: 1.55; }
 .message p { margin: 0; }
 .bot-avatar { flex: 0 0 32px; height: 32px; border-radius: 9px; background: var(--green); color: white; display: grid; place-items: center; font-size: 10px; font-weight: 900; }
 .tutor-message div:last-child, .user-message div { background: white; border: 1px solid var(--line); padding: 13px 15px; border-radius: 4px 14px 14px 14px; }
@@ -86,10 +103,15 @@ main { padding: 0 42px 50px; overflow: hidden; }
 .quick-prompts { padding: 10px 20px; display: flex; gap: 8px; overflow: auto; }
 .quick-prompts button { border: 1px solid var(--line); border-radius: 999px; background: white; padding: 7px 10px; color: var(--green); white-space: nowrap; }
 .chat-input { display: flex; gap: 10px; padding: 15px 20px 20px; }
-.chat-input input { flex: 1; border: 1px solid var(--line); border-radius: 10px; padding: 12px; outline-color: var(--green); }
+.chat-input input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 12px; outline-color: var(--green); }
 .assessment-wrap { max-width: 820px; margin: 0 auto; }
 .section-intro { margin: 10px 0 24px; }
 .section-intro p:last-child { color: var(--muted); }
+.practice-source { display: grid; grid-template-columns: 1.2fr .8fr 1fr; gap: 12px; margin-bottom: 12px; }
+.practice-settings { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.practice-source label, .practice-settings label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 800; }
+.practice-source input, .practice-source select, .practice-settings select { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 11px; background: white; color: var(--ink); outline-color: var(--green); }
+.practice-settings button { align-self: end; }
 .quiz-card { padding: 30px; }
 .quiz-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; }
 .quiz-card h2 { margin: 28px 0; line-height: 1.45; }
@@ -98,7 +120,12 @@ main { padding: 0 42px 50px; overflow: hidden; }
 .answers button:hover { border-color: var(--green); }
 .answers button.selected-correct { background: #e8f5ea; border-color: #4e9b64; }
 .answers button.selected-wrong { background: #fff0eb; border-color: var(--orange); }
+.answer-panel { margin-top: 16px; border: 1px solid #cfe5d2; background: #f4faf2; border-radius: 10px; padding: 14px; line-height: 1.45; }
+.answer-panel strong { display: block; margin-bottom: 5px; }
+.answer-panel small { display: block; color: var(--muted); margin-top: 8px; }
 .feedback { margin: 18px 0; border-left: 4px solid var(--green); background: #f1f5ee; padding: 13px; line-height: 1.5; }
+.feedback p { margin: 0 0 8px; }
+.feedback p:last-child { margin-bottom: 0; }
 .hidden { display: none !important; }
 .week-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .day-card { padding: 20px; min-height: 230px; }
@@ -119,8 +146,20 @@ main { padding: 0 42px 50px; overflow: hidden; }
   .nav-item.active { display: block; text-align: center; }
   main { padding: 0 18px 35px; }
   .stat-grid, .week-grid { grid-template-columns: repeat(2, 1fr); }
+  .practice-source { grid-template-columns: 1fr; }
+  .practice-settings { grid-template-columns: 1fr 1fr; }
   .content-grid, .tutor-layout { grid-template-columns: 1fr; height: auto; }
   .tutor-info { display: none; }
+}
+@media (max-height: 760px) and (min-width: 901px) {
+  .topbar { min-height: 86px; }
+  .tutor-layout { min-height: calc(100vh - 116px); }
+  .chat-card { min-height: calc(100vh - 116px); }
+  .tutor-info { max-height: calc(100vh - 116px); }
+  .messages { min-height: 180px; }
+  .chat-header { padding: 14px 18px; }
+  .quick-prompts { padding: 8px 18px; }
+  .chat-input { padding: 12px 18px 16px; }
 }
 @media (max-width: 600px) {
   .app-shell { display: block; }
@@ -129,6 +168,16 @@ main { padding: 0 42px 50px; overflow: hidden; }
   .profile { display: none; }
   .brand { margin: 0; }
   .stat-grid, .week-grid { grid-template-columns: 1fr; }
+  .practice-source { grid-template-columns: 1fr; }
+  .practice-settings { grid-template-columns: 1fr; }
   .alert-card { grid-template-columns: 1fr; }
   .alert-icon { display: none; }
 }
+
+.upload-card { border: 1px solid var(--line); padding: 12px; border-radius: 10px; margin: 9px 0; display: grid; gap: 8px; background: #fbfcf8; }
+.upload-card small { color: var(--muted); line-height: 1.4; }
+.upload-card input { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 9px; background: white; color: var(--ink); }
+.upload-card input[type="file"] { padding: 8px; font-size: 12px; }
+
+.short-answer { width: 100%; min-height: 110px; border: 1px solid var(--line); border-radius: 10px; padding: 12px; resize: vertical; outline-color: var(--green); background: white; color: var(--ink); }
+.answers .primary { width: fit-content; margin-top: 4px; }

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -16,8 +16,9 @@
       <nav aria-label="Main navigation">
         <button class="nav-item active" data-view="dashboard"><span>01</span> Overview</button>
         <button class="nav-item" data-view="tutor"><span>02</span> AI Tutor</button>
-        <button class="nav-item" data-view="assessment"><span>03</span> Practice</button>
-        <button class="nav-item" data-view="plan"><span>04</span> Study Plan</button>
+        <button class="nav-item" data-view="knowledge"><span>03</span> Knowledge</button>
+        <button class="nav-item" data-view="assessment"><span>04</span> Practice</button>
+        <button class="nav-item" data-view="plan"><span>05</span> Study Plan</button>
       </nav>
       <div class="semester-card">
         <p class="eyebrow">SPRING SEMESTER</p>
@@ -38,7 +39,7 @@
           <h1 id="page-title">Good afternoon, Thuan</h1>
         </div>
         <div class="top-actions">
-          <button class="icon-button" id="reset-demo" title="Reset demo">↻</button>
+          <button class="icon-button" id="reset-demo" title="Reset demo">Reset</button>
           <button class="notification" aria-label="Notifications">3</button>
         </div>
       </header>
@@ -55,25 +56,29 @@
         </div>
 
         <div class="stat-grid">
-          <article class="stat"><p>Course average</p><strong>78.4%</strong><span class="positive">+2.3% this month</span></article>
-          <article class="stat"><p>Topics mastered</p><strong>24 / 31</strong><span>4 in progress</span></article>
-          <article class="stat"><p>Study streak</p><strong>8 days</strong><span>Personal best: 12</span></article>
-          <article class="stat"><p>Next deadline</p><strong>2 days</strong><span>Calculus problem set</span></article>
+          <article class="stat"><p>Course average</p><strong id="stat-average">78.4%</strong><span id="stat-average-note" class="positive">+2.3% this month</span></article>
+          <article class="stat"><p>Topics mastered</p><strong id="stat-topics">24 / 31</strong><span id="stat-topics-note">4 in progress</span></article>
+          <article class="stat"><p>Saved chats</p><strong id="stat-chats">0</strong><span id="stat-chats-note">Tutor sessions</span></article>
+          <article class="stat"><p>Knowledge chunks</p><strong id="stat-chunks">0</strong><span id="stat-chunks-note">Course materials</span></article>
         </div>
 
         <div class="content-grid">
           <article class="panel progress-panel">
             <div class="panel-heading"><div><p class="eyebrow">LEARNING ANALYTICS</p><h2>Course progress</h2></div><span class="chip">Live profile</span></div>
-            <div class="course-row"><div><strong>Data Structures</strong><small>9 of 11 topics mastered</small></div><div class="course-score">86%</div><div class="progress"><span style="width:86%"></span></div></div>
-            <div class="course-row"><div><strong>Calculus II</strong><small>Weak: integration by parts</small></div><div class="course-score warning">64%</div><div class="progress warning-bar"><span style="width:64%"></span></div></div>
-            <div class="course-row"><div><strong>Database Systems</strong><small>7 of 9 topics mastered</small></div><div class="course-score">82%</div><div class="progress"><span style="width:82%"></span></div></div>
+            <div id="course-progress">
+              <div class="course-row"><div><strong>Data Structures</strong><small>9 of 11 topics mastered</small></div><div class="course-score">86%</div><div class="progress"><span style="width:86%"></span></div></div>
+              <div class="course-row"><div><strong>Calculus II</strong><small>Weak: integration by parts</small></div><div class="course-score warning">64%</div><div class="progress warning-bar"><span style="width:64%"></span></div></div>
+              <div class="course-row"><div><strong>Database Systems</strong><small>7 of 9 topics mastered</small></div><div class="course-score">82%</div><div class="progress"><span style="width:82%"></span></div></div>
+            </div>
           </article>
 
           <article class="panel">
             <div class="panel-heading"><div><p class="eyebrow">NEXT UP</p><h2>This week</h2></div><button class="text-button" data-view-button="plan">View plan</button></div>
-            <div class="task"><span class="date">07<br><small>JUN</small></span><div><strong>Calculus problem set</strong><small>Due in 2 days · High priority</small></div></div>
-            <div class="task"><span class="date">09<br><small>JUN</small></span><div><strong>Binary tree practice</strong><small>25 min · Adaptive quiz</small></div></div>
-            <div class="task"><span class="date">11<br><small>JUN</small></span><div><strong>Database midterm</strong><small>3 topics to review</small></div></div>
+            <div id="activity-list">
+              <div class="task"><span class="date">07<br><small>JUN</small></span><div><strong>Calculus problem set</strong><small>Due in 2 days - High priority</small></div></div>
+              <div class="task"><span class="date">09<br><small>JUN</small></span><div><strong>Binary tree practice</strong><small>25 min - Adaptive quiz</small></div></div>
+              <div class="task"><span class="date">11<br><small>JUN</small></span><div><strong>Database midterm</strong><small>3 topics to review</small></div></div>
+            </div>
           </article>
         </div>
       </section>
@@ -82,21 +87,38 @@
         <div class="tutor-layout">
           <article class="panel tutor-info">
             <p class="eyebrow">CURRENT CONTEXT</p>
-            <h2>Calculus II</h2>
+            <h2 id="current-course-label">C Programming</h2>
+            <small id="current-topic-label">Pointers in C</small>
             <div class="topic-score"><span>Topic confidence</span><strong id="confidence">46%</strong></div>
             <div class="progress warning-bar"><span id="confidence-bar" style="width:46%"></span></div>
-            <h3>Retrieved sources</h3>
-            <div class="source-card"><strong>Lecture 08</strong><small>Integration techniques · pp. 12–15</small></div>
-            <div class="source-card"><strong>Calculus Textbook</strong><small>Chapter 7.1 · Integration by parts</small></div>
+            <form class="context-form" id="topic-form">
+              <label>
+                Course
+                <input id="course-input" type="text" value="C Programming">
+              </label>
+              <label>
+                Topic
+                <input id="topic-input" type="text" value="Pointers in C">
+              </label>
+              <button class="secondary full" type="submit">Set topic</button>
+            </form>
+            <button class="text-button new-chat-button" id="new-chat" type="button">New chat</button>
+            <h3>Chat history</h3>
+            <div id="chat-sessions" class="session-list">
+              <div class="source-card"><strong>No saved chats yet</strong><small>Ask a question to create a topic session.</small></div>
+            </div>
             <button class="secondary full" id="quiz-from-chat">Quiz me on this topic</button>
           </article>
 
           <article class="chat-card">
-            <div class="chat-header"><div><span class="online-dot"></span><strong>Tutor Agent</strong><small>Grounded in your course materials</small></div><span class="chip">RAG active</span></div>
+            <div class="chat-header">
+              <div><span class="online-dot"></span><strong>Tutor Agent</strong><small id="chat-context-label">C Programming - Pointers in C</small></div>
+              <span class="chip" id="chat-rag-label">RAG active</span>
+            </div>
             <div class="messages" id="messages" aria-live="polite">
               <div class="message tutor-message">
                 <span class="bot-avatar">AI</span>
-                <div><p>I noticed integration by parts has been difficult recently. Would you like a quick explanation, a worked example, or a hint-first exercise?</p><button class="citation">[1] Lecture 08, p. 12</button></div>
+                <div><p>Ask about pointers, arrays, strings, or another topic from your uploaded programming material.</p><button class="citation">Course materials</button></div>
               </div>
             </div>
             <div class="quick-prompts">
@@ -104,8 +126,30 @@
             </div>
             <form class="chat-input" id="chat-form">
               <label class="sr-only" for="chat-text">Ask the tutor</label>
-              <input id="chat-text" autocomplete="off" placeholder="Ask about integration by parts..." required>
+              <input id="chat-text" autocomplete="off" placeholder="Ask about pointers in C..." required>
               <button class="send" type="submit">Send</button>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="knowledge">
+        <div class="content-grid">
+          <article class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">KNOWLEDGE BASE</p><h2>Course materials</h2></div><span class="chip">Chroma RAG</span></div>
+            <div class="source-card" id="rag-status"><strong>RAG status</strong><small>Checking knowledge base...</small></div>
+            <div id="uploaded-documents"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">UPLOAD</p><h2>Add material</h2></div></div>
+            <form class="upload-card" id="document-upload-form">
+              <strong>Upload course material</strong>
+              <small>PDF, TXT, or MD. Use narrow keywords for large textbooks.</small>
+              <input id="document-file" type="file" accept=".pdf,.txt,.md" required>
+              <input id="document-title" type="text" placeholder="Document title, e.g. C How to Program">
+              <input id="document-keywords" type="text" placeholder="Optional keywords, e.g. pointers">
+              <button class="secondary full" type="submit">Upload and index</button>
+              <small id="upload-status">Embedding model: nomic-embed-text</small>
             </form>
           </article>
         </div>
@@ -113,16 +157,62 @@
 
       <section class="view" id="assessment">
         <div class="assessment-wrap">
-          <div class="section-intro"><p class="eyebrow">ASSESSMENT AGENT</p><h2>Adaptive practice</h2><p>The next question changes based on your answer. Explanations use the same course sources as your tutor.</p></div>
+          <div class="section-intro"><p class="eyebrow">ASSESSMENT AGENT</p><h2>Adaptive practice</h2><p id="practice-context">C Programming - Pointers in C</p></div>
+          <div class="practice-source">
+            <label>
+              Material
+              <select id="practice-document">
+                <option value="">All uploaded materials</option>
+              </select>
+            </label>
+            <label>
+              Course
+              <input id="practice-course" type="text" value="C Programming">
+            </label>
+            <label>
+              Topic
+              <input id="practice-topic" type="text" value="Pointers in C" placeholder="e.g. pointers, arrays, Ohm's law">
+            </label>
+          </div>
+          <div class="practice-settings">
+            <label>
+              Questions
+              <select id="quiz-count">
+                <option value="3">3</option>
+                <option value="4" selected>4</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+              </select>
+            </label>
+            <label>
+              Difficulty
+              <select id="quiz-difficulty">
+                <option value="auto" selected>Auto from mastery</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </label>
+            <label>
+              Type
+              <select id="quiz-type">
+                <option value="mixed" selected>Mixed</option>
+                <option value="multiple_choice">Multiple choice</option>
+                <option value="short_answer">Short answer</option>
+              </select>
+            </label>
+            <button class="secondary" id="generate-practice" type="button">Generate practice</button>
+          </div>
           <article class="quiz-card" id="quiz-card">
-            <div class="quiz-meta"><span class="chip" id="difficulty">Level 1 · Foundation</span><span>Question <b id="question-number">1</b> of 3</span></div>
-            <h2 id="quiz-question">For ∫x cos(x) dx, which choice correctly assigns u and dv?</h2>
+            <div class="quiz-meta"><span class="chip" id="difficulty">Level 1 - Foundation</span><span>Question <b id="question-number">1</b> of <b id="question-total">3</b></span></div>
+            <h2 id="quiz-question">For integral x cos(x) dx, which choice correctly assigns u and dv?</h2>
             <div class="answers" id="answers">
               <button data-answer="wrong">u = cos(x), dv = x dx</button>
               <button data-answer="correct">u = x, dv = cos(x) dx</button>
               <button data-answer="wrong">u = x cos(x), dv = dx</button>
               <button data-answer="wrong">u = 1, dv = x cos(x) dx</button>
             </div>
+            <div class="answer-panel hidden" id="answer-panel"></div>
             <div class="feedback hidden" id="feedback"></div>
             <button class="primary hidden" id="next-question">Next question</button>
           </article>
@@ -132,10 +222,10 @@
       <section class="view" id="plan">
         <div class="section-intro"><p class="eyebrow">CURRICULUM PLANNER AGENT</p><h2>Your prioritized week</h2><p>Generated from weak topics, deadlines, and 4.5 available study hours.</p></div>
         <div class="week-grid">
-          <article class="day-card priority"><p>MON · JUN 08</p><h3>Integration by parts</h3><span>35 min · Calculus II</span><div class="tag">Priority: High</div><small>Review concept → 2 worked examples → 5-question quiz</small></article>
-          <article class="day-card"><p>TUE · JUN 09</p><h3>Binary search trees</h3><span>30 min · Data Structures</span><div class="tag">Practice</div><small>Traversal recap → adaptive coding questions</small></article>
-          <article class="day-card"><p>WED · JUN 10</p><h3>Normalization</h3><span>45 min · Databases</span><div class="tag">Exam prep</div><small>Functional dependencies → 3NF exercises</small></article>
-          <article class="day-card"><p>THU · JUN 11</p><h3>Mixed review</h3><span>25 min · Calculus II</span><div class="tag">Reinforce</div><small>Spaced review based on Monday's quiz result</small></article>
+          <article class="day-card priority"><p>MON - JUN 08</p><h3>Integration by parts</h3><span>35 min - Calculus II</span><div class="tag">Priority: High</div><small>Review concept -> 2 worked examples -> 5-question quiz</small></article>
+          <article class="day-card"><p>TUE - JUN 09</p><h3>Binary search trees</h3><span>30 min - Data Structures</span><div class="tag">Practice</div><small>Traversal recap -> adaptive coding questions</small></article>
+          <article class="day-card"><p>WED - JUN 10</p><h3>Normalization</h3><span>45 min - Databases</span><div class="tag">Exam prep</div><small>Functional dependencies -> 3NF exercises</small></article>
+          <article class="day-card"><p>THU - JUN 11</p><h3>Mixed review</h3><span>25 min - Calculus II</span><div class="tag">Reinforce</div><small>Spaced review based on Monday's quiz result</small></article>
         </div>
         <article class="panel rationale"><p class="eyebrow">WHY THIS PLAN?</p><p><strong>Calculus receives first priority</strong> because the topic score fell below 60% and an assignment is due in two days. Database review is scheduled before the midterm, while strong Data Structures performance requires only maintenance practice.</p></article>
       </section>
@@ -145,3 +235,6 @@
   <script src="app.js"></script>
 </body>
 </html>
+
+
+

@@ -1,0 +1,626 @@
+[
+  {
+    "chunkId": "calculus-p7-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 7,
+    "content": "Contents v 5 5.1 Areas and Distances 366 5.2 The Definite Integral 378 Discovery Project • Area Functions 391 5.3 The Fundamental Theorem of Calculus 392 5.4 Indefinite Integrals and the Net Change Theorem 402 Writing Project • Newton, Leibniz, and the Invention of Calculus 411 5.5 The Substitution Rule 412 Review 421 Problems Plus 425 6 6.1 Areas Between Curves 428 Applied Project • The Gini Index 436 6.2 Volumes 438 6.3 Volumes by Cylindrical Shells 449 6.4 Work 455 6.5 Average Value of a Function 461 Applied Project • Calculus and Baseball 464 Applied Project • Where to Sit at the Movies 465 Review 466 Problems Plus 468 7 7.1 Integration by Parts 472 7.2 Trigonometric Integrals 479 7.3 Trigonometric Substitution 486 7.4 Integration of Rational Functions by Partial Fractions 493 7.5 Strategy for Integration 503 7.6 Integration Using Tables and Computer Algebra Systems 508 Discovery Project • Patterns in Integrals 513 7.7 Approximate Integration 514 7.8 Improper Integrals 527 Review 537 Problems Plus 540 Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or"
+  },
+  {
+    "chunkId": "calculus-p7-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 7,
+    "content": "Using Tables and Computer Algebra Systems 508 Discovery Project • Patterns in Integrals 513 7.7 Approximate Integration 514 7.8 Improper Integrals 527 Review 537 Problems Plus 540 Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p503-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 503,
+    "content": "471 The photo shows a screw- worm fly, the first pest effectively eliminated from a region by the sterile insect technique without pesticides. The idea is to introduce into the population sterile males that mate with females but produce no offspring. In Exercise 7.4.67 you will evaluate an integral that relates the female insect population to time. Techniques of Integration Because of the fundamental theorem of Calculus, we can integrate a function if we know an antiderivative, that is, an indefinite integral. We summarize here the most important integrals that we have learned so far. y xn dx − xn11 n 1 1 1 C sn ± 21d y 1 x dx − ln | x | 1 C y ex dx − ex 1 C y bx dx − bx ln b 1 C y sin x dx − 2cos x 1 C y cos x dx − sin x 1 C y sec2x dx − tan x 1 C y csc2x dx − 2cot x 1 C y sec x tan x dx − sec x 1 C"
+  },
+  {
+    "chunkId": "calculus-p503-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 503,
+    "content": "2cos x 1 C y cos x dx − sin x 1 C y sec2x dx − tan x 1 C y csc2x dx − 2cot x 1 C y sec x tan x dx − sec x 1 C y csc x cot x dx − 2csc x 1 C y sinh x dx − cosh x 1 C y cosh x dx − sinh x 1 C y tan x dx − ln | sec x | 1 C y cot x dx − ln | sin x | 1 C y 1 x2 1 a2 dx − 1 a tan21 S x a D1 C y 1 sa2 2 x2 dx − sin21 S x a D1 C, a . 0 In this chapter we develop techniques for using these basic integration formulas to obtain indefinite integrals of more complicated functions. We learned the most important method of inte­ gration, the Substitution Rule, in Section 5.5. The other general technique, integration by parts, is presented in Section 7.1. Then we learn methods that are special to particular"
+  },
+  {
+    "chunkId": "calculus-p503-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 503,
+    "content": "of more complicated functions. We learned the most important method of inte­ gration, the Substitution Rule, in Section 5.5. The other general technique, integration by parts, is presented in Section 7.1. Then we learn methods that are special to particular classes of functions, such as trigonometric functions and rational functions. Integration is not as straightforward as differentiation; there are no rules that absolutely guar­ antee obtaining an indefinite integral of a function. Therefore we discuss a strategy for integration in Section 7.5. 7 USDA Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p504-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 504,
+    "content": "472 Chapter 7 Techniques of Integration Every differentiation rule has a corresponding integration rule. For instance, the Substi­ tution Rule for integration corresponds to the Chain Rule for differentiation. The rule that corresponds to the Product Rule for differentiation is called the rule for integration by parts. The Product Rule states that if f and t are differentiable functions, then d dx f f sxdtsxdg − f sxdt9sxd 1 tsxd f 9sxd In the notation for indefinite integrals this equation becomes y f f sxdt9sxd 1 tsxd f 9sxdg dx − f sxdtsxd or y f sxdt9sxd dx 1 y tsxd f 9sxd dx − f sxdtsxd We can rearrange this equation as y f sxdt9sxd dx − f sxdtsxd 2 y tsxd f 9sxd dx Formula 1 is called the formula for integration by parts. It is perhaps easier to remem­ ber in the following notation. Let u − f sxd and v − tsxd. Then the differentials are du − f 9sxd dx and dv − t9sxd dx, so, by the Substitution Rule, the formula for integra­ tion"
+  },
+  {
+    "chunkId": "calculus-p504-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 504,
+    "content": "to remem­ ber in the following notation. Let u − f sxd and v − tsxd. Then the differentials are du − f 9sxd dx and dv − t9sxd dx, so, by the Substitution Rule, the formula for integra­ tion by parts becomes y u dv − uv 2 y v du example 1 Find y x sin x dx. SOLUtION USING FO rMULa 1 Suppose we choose f sxd − x and t9sxd − sin x. Then f 9sxd − 1 and tsxd − 2cos x. (For t we can choose any antiderivative of t9.) Thus, using Formula 1, we have y x sin x dx − f sxdtsxd 2 y tsxd f 9sxd dx − xs2cos xd 2 y s2cos xd dx − 2x cos x 1 y cos x dx − 2x cos x 1 sin x 1 C 1 2 Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial"
+  },
+  {
+    "chunkId": "calculus-p504-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 504,
+    "content": "1 C 1 2 Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p505-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 505,
+    "content": "SeCtION 7.1 Integration by Parts 473 It’s wise to check the answer by differentiating it. If we do so, we get x sin x, as expected. SOLUtION USING FO rMULa 2 Let u − x dv − sin x dx Then du − dx v − 2cos x and so u d√ u √ √ du y x sin x dx − y x sin x dx − x s2cos xd 2 y s2cos xd dx − 2x cos x 1 y cos x dx − 2x cos x 1 sin x 1 C n Note Our aim in using integration by parts is to obtain a simpler integral than the one we started with. Thus in Example 1 we started with y x sin x dx and expressed it in terms of the simpler integral y cos x dx. If we had instead chosen u − sin x and dv − x dx, then du − cos x dx and v − x2y2, so integration by parts gives y x sin x dx − ssin xd x2 2 2"
+  },
+  {
+    "chunkId": "calculus-p505-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 505,
+    "content": "If we had instead chosen u − sin x and dv − x dx, then du − cos x dx and v − x2y2, so integration by parts gives y x sin x dx − ssin xd x2 2 2 1 2 y x2 cos x dx Although this is true, y x2 cos x dx is a more difficult integral than the one we started with. In general, when deciding on a choice for u and dv, we usually try to choose u − f sxd to be a function that becomes simpler when differentiated (or at least not more complicated) as long as dv − t9sxd dx can be readily integrated to give v. example 2 Evaluate y ln x dx. SOLUtION Here we don’t have much choice for u and dv. Let u − ln x dv − dx Then du − 1 x dx v − x Integrating by parts, we get y ln x dx − x ln x 2 y x dx x − x ln x 2 y dx − x ln x"
+  },
+  {
+    "chunkId": "calculus-p505-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 505,
+    "content": "− dx Then du − 1 x dx v − x Integrating by parts, we get y ln x dx − x ln x 2 y x dx x − x ln x 2 y dx − x ln x 2 x 1 C Integration by parts is effective in this example because the derivative of the func­ tion f sxd − ln x is simpler than f. n It is helpful to use the pattern: u − /H17040 dv − /H17040 du − /H17040 v − /H17040 It’s customary to write y 1 dx as y dx. Check the answer by differentiating it. Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p505-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 505,
+    "content": "review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p506-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 506,
+    "content": "474 Chapter 7 Techniques of Integration example 3 Find y t2et dt. SOLUtION Notice that t2 becomes simpler when differentiated (whereas et is unchanged when differentiated or integrated), so we choose u − t2 dv − et dt Then du − 2t dt v − et Integration by parts gives y t2et dt − t2et 2 2 y tet dt The integral that we obtained, y tet dt, is simpler than the original integral but is still not obvious. Therefore we use integration by parts a second time, this time with u − t and dv − et dt. Then du − dt, v − et, and y tet dt − tet 2 y et dt − tet 2 et 1 C Putting this in Equation 3, we get y t 2et dt − t2et 2 2 y tet dt − t2et 2 2stet 2 et 1 Cd − t2et 2 2tet 1 2et 1 C1 where C1 − 22C n example 4 Evaluate y ex sin x dx. SOLUtION Neither ex nor sin x becomes simpler when differentiated, but"
+  },
+  {
+    "chunkId": "calculus-p506-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 506,
+    "content": "− t2et 2 2stet 2 et 1 Cd − t2et 2 2tet 1 2et 1 C1 where C1 − 22C n example 4 Evaluate y ex sin x dx. SOLUtION Neither ex nor sin x becomes simpler when differentiated, but we try choos­ ing u − ex and dv − sin x dx anyway. Then du − ex dx and v − 2cos x, so integration by parts gives y ex sin x dx − 2ex cos x 1 y ex cos x dx The integral that we have obtained, y ex cos x dx, is no simpler than the original one, but at least it’s no more difficult. Having had success in the preceding example integrating by parts twice, we persevere and integrate by parts again. This time we use u − ex and dv − cos x dx. Then du − ex dx, v − sin x, and y ex cos x dx − ex sin x 2 y ex sin x dx At first glance, it appears as if we have accomplished nothing because we have arrived"
+  },
+  {
+    "chunkId": "calculus-p506-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 506,
+    "content": "Then du − ex dx, v − sin x, and y ex cos x dx − ex sin x 2 y ex sin x dx At first glance, it appears as if we have accomplished nothing because we have arrived at y ex sin x dx, which is where we started. However, if we put the expression for y ex cos x dx from Equation 5 into Equation 4 we get y ex sin x dx − 2ex cos x 1 ex sin x 2 y ex sin x dx 3 An easier method, using complex numbers, is given in Exercise 50 in Appendix H. 4 5 Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p506-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 506,
+    "content": "and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p507-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 507,
+    "content": "SeCtION 7.1 Integration by Parts 475 This can be regarded as an equation to be solved for the unknown integral. Adding y ex sin x dx to both sides, we obtain 2 y ex sin x dx − 2ex cos x 1 ex sin x Dividing by 2 and adding the constant of integration, we get y ex sin x dx − 1 2 exssin x 2 cos xd 1 C n If we combine the formula for integration by parts with Part 2 of the Fundamental Theorem of Calculus, we can evaluate definite integrals by parts. Evaluating both sides of Formula 1 between a and b, assuming f 9 and t9 are continuous, and using the Funda­ mental Theorem, we obtain y b a f sxdt9sxd dx − f sxdtsxdga b 2 y b a tsxd f 9sxd dx example 5 Calculate y 1 0 tan21x dx. SOLUtION Let u − tan21x dv − dx Then du − dx 1 1 x2 v − x So Formula 6 gives y 1 0 tan21x dx − x tan21xg0 1 2"
+  },
+  {
+    "chunkId": "calculus-p507-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 507,
+    "content": "example 5 Calculate y 1 0 tan21x dx. SOLUtION Let u − tan21x dv − dx Then du − dx 1 1 x2 v − x So Formula 6 gives y 1 0 tan21x dx − x tan21xg0 1 2 y 1 0 x 1 1 x2 dx − 1 ? tan21 1 2 0 ? tan21 0 2 y 1 0 x 1 1 x2 dx − /H9266 4 2 y 1 0 x 1 1 x2 dx To evaluate this integral we use the substitution t − 1 1 x2 (since u has another mean­ ing in this example). Then dt − 2x dx, so x dx − 1 2 dt. When x − 0, t − 1; when x − 1, t − 2; so y 1 0 x 1 1 x2 dx − 1 2 y 2 1 dt t − 1 2 ln | t |g1 2 − 1 2 sln 2 2 ln 1d − 1 2 ln 2 Therefore y 1 0 tan21x dx − /H9266 4 2 y 1 0 x 1"
+  },
+  {
+    "chunkId": "calculus-p507-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 507,
+    "content": "2 1 dt t − 1 2 ln | t |g1 2 − 1 2 sln 2 2 ln 1d − 1 2 ln 2 Therefore y 1 0 tan21x dx − /H9266 4 2 y 1 0 x 1 1 x2 dx − /H9266 4 2 ln 2 2 n example 6 Prove the reduction formula y sinnx dx − 2 1 n cos x sinn21x 1 n 2 1 n y sinn22x dx where n > 2 is an integer. Figure 1 illustrates Example 4 by show­ ing the graphs of f sxd − ex sin x and Fsxd − 1 2 exssin x 2 cos xd. As a visual check on our work, notice that f sxd − 0 when F has a maximum or minimum. _3 _4 12 6 F f FIGURE 1 6 Since tan21x > 0 for x > 0, the integral in Example 5 can be interpreted as the area of the region shown in Figure 2. y 0 x1 y=tan–!x FIGURE 2 7 Equation 7 is called a reduction for- mula because"
+  },
+  {
+    "chunkId": "calculus-p507-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 507,
+    "content": "> 0 for x > 0, the integral in Example 5 can be interpreted as the area of the region shown in Figure 2. y 0 x1 y=tan–!x FIGURE 2 7 Equation 7 is called a reduction for- mula because the exponent n has been reduced to n 2 1 and n 2 2. Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p508-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 508,
+    "content": "476 Chapter 7 Techniques of Integration SOLUtION Let u − sinn21x dv − sin x dx Then du − sn 2 1d sinn22x cos x dx v − 2cos x so integration by parts gives y sinnx dx − 2cos x sinn21x 1 sn 2 1d y sinn22x cos2x dx Since cos2x − 1 2 sin2x, we have y sinnx dx − 2cos x sinn21x 1 sn 2 1d y sinn22x dx 2 sn 2 1d y sinnx dx As in Example 4, we solve this equation for the desired integral by taking the last term on the right side to the left side. Thus we have n y sinnx dx − 2cos x sinn21x 1 sn 2 1d y sinn22x dx or y sinnx dx − 2 1 n cos x sinn21x 1 n 2 1 n y sinn22x dx n The reduction formula (7) is useful because by using it repeatedly we could eventu­ ally express y sinnx dx in terms of y sin x dx (if n is odd) or y ssin xd0 dx − y dx"
+  },
+  {
+    "chunkId": "calculus-p508-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 508,
+    "content": "dx n The reduction formula (7) is useful because by using it repeatedly we could eventu­ ally express y sinnx dx in terms of y sin x dx (if n is odd) or y ssin xd0 dx − y dx (if n is even). 1–2 Evaluate the integral using integration by parts with the indicated choices of u and dv. 1. y xe2x dx; u − x, dv − e2x dx 2. y sx ln x dx; u − ln x, dv − sx dx 3–36 Evaluate the integral. 3. y x cos 5x dx 4. y ye0.2y dy 5. y te23t dt 6. y sx 2 1d sin /H9266x dx 7. y sx2 1 2xd cos x dx 8. y t2 sin /H9252t dt 9. y cos21x dx 10. y ln sx dx 11. y t4 ln t dt 12. y tan21 2y dy 13. y t csc2 t dt 14. y x cosh ax dx 15. y sln xd2 dx 16. y z 10 z dz 17. y e2/H9258 sin 3/H9258 d/H9258 18. y e2/H9258 cos 2/H9258 d/H9258"
+  },
+  {
+    "chunkId": "calculus-p508-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 508,
+    "content": "12. y tan21 2y dy 13. y t csc2 t dt 14. y x cosh ax dx 15. y sln xd2 dx 16. y z 10 z dz 17. y e2/H9258 sin 3/H9258 d/H9258 18. y e2/H9258 cos 2/H9258 d/H9258 19. y z3e z dz 20. y x tan2 x dx 21. y xe 2x s1 1 2xd2 dx 22. y sarcsin xd2 dx 23. y 1y2 0 x cos /H9266x dx 24. y 1 0 sx2 1 1de2x dx 25. y 2 0 y sinh y dy 26. y 2 1 w2 ln w dw 27. y 5 1 ln R R2 dR 28. y 2/H9266 0 t2 sin 2t dt 29. y /H9266 0 x sin x cos x dx 30. y s3 1 arctans1yxd dx Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage"
+  },
+  {
+    "chunkId": "calculus-p508-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 508,
+    "content": "or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p509-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 509,
+    "content": "SeCtION 7.1 Integration by Parts 477 50. Prove that, for even powers of sine, y /H9266y2 0 sin2nx dx − 1 ? 3 ? 5 ? ∙ ∙ ∙ ? s2n 2 1d 2 ? 4 ? 6 ? ∙ ∙ ∙ ? 2n /H9266 2 51–54 Use integration by parts to prove the reduction formula. 51. y sln xdn dx − xsln xdn 2 n y sln xdn21 dx 52. y xnex dx − xnex 2 n y xn21ex dx 53. y tann x dx − tann21 x n 2 1 2 y tann22 x dx sn ± 1d 54. y secnx dx − tan x sec n22x n 2 1 1 n 2 2 n 2 1 y secn22x dx sn ± 1d 55. Use Exercise 51 to find y sln xd3 dx. 56. Use Exercise 52 to find y x4ex dx. 57–58 Find the area of the region bounded by the given curves. 57. y − x2 ln x, y − 4 ln x 58. y − x2e2x, y − xe2x 59–60 Use a graph to find"
+  },
+  {
+    "chunkId": "calculus-p509-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 509,
+    "content": "find y x4ex dx. 57–58 Find the area of the region bounded by the given curves. 57. y − x2 ln x, y − 4 ln x 58. y − x2e2x, y − xe2x 59–60 Use a graph to find approximate x­coordinates of the points of intersection of the given curves. Then find (approxi­ mately) the area of the region bounded by the curves. 59. y − arcsins1 2 xd, y − 2 2 x2 60. y − x lnsx 1 1d, y − 3x 2 x2 61–64 Use the method of cylindrical shells to find the volume generated by rotating the region bounded by the curves about the given axis. 61. y − coss/H9266xy2d, y − 0, 0 < x < 1; about the y­axis 62. y − ex, y − e2x, x − 1; about the y­axis 63. y − e2x, y − 0, x − 21, x − 0; about x − 1 64. y − ex, x − 0, y − 3; about the x­axis 65. Calculate the volume generated by rotating the region bounded by"
+  },
+  {
+    "chunkId": "calculus-p509-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 509,
+    "content": "y − e2x, y − 0, x − 21, x − 0; about x − 1 64. y − ex, x − 0, y − 3; about the x­axis 65. Calculate the volume generated by rotating the region bounded by the curves y − ln x, y − 0, and x − 2 about each axis. (a) The y­axis (b) The x­axis 66. Calculate the average value of f sxd − x sec2x on the interval f0, /H9266y4g. 67. The Fresnel function Ssxd − y x 0 sin(1 2 /H9266t2) dt was discussed in Example 5.3.3 and is used extensively in the theory of optics. Find y Ssxd dx. [Your answer will involve Ssxd.] ; 31. y 5 1 M eM dM 32. y 2 1 sln xd2 x3 dx 33. y /H9266y3 0 sin x lnscos xd dx 34. y 1 0 r3 s4 1 r2 dr 35. y 2 1 x4sln xd2 dx 36. y t 0 es sinst 2 sd ds 37–42 First make a substitution and then use integration by parts to evaluate the integral. 37."
+  },
+  {
+    "chunkId": "calculus-p509-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 509,
+    "content": "y 1 0 r3 s4 1 r2 dr 35. y 2 1 x4sln xd2 dx 36. y t 0 es sinst 2 sd ds 37–42 First make a substitution and then use integration by parts to evaluate the integral. 37. y esx dx 38. y cossln xd dx 39. y s/H9266 s/H9266y2 /H92583 coss/H92582 d d/H9258 40. y /H9266 0 ecos t sin 2t dt 41. y x lns1 1 xd dx 42. y arcsinsln xd x dx 43–46 Evaluate the indefinite integral. Illustrate, and check that your answer is reasonable, by graphing both the function and its antiderivative (take C − 0). 43. y xe22x dx 44. y x3y2 ln x dx 45. y x3s1 1 x2 dx 46. y x2 sin 2x dx 47. (a) Use the reduction formula in Example 6 to show that y sin2x dx − x 2 2 sin 2x 4 1 C (b) Use part (a) and the reduction formula to evaluate y sin4x dx. 48. (a) Prove the reduction formula y cosnx dx − 1 n cosn21x sin x 1 n 2"
+  },
+  {
+    "chunkId": "calculus-p509-c5",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 509,
+    "content": "− x 2 2 sin 2x 4 1 C (b) Use part (a) and the reduction formula to evaluate y sin4x dx. 48. (a) Prove the reduction formula y cosnx dx − 1 n cosn21x sin x 1 n 2 1 n y cosn22x dx (b) Use part (a) to evaluate y cos2x dx. (c) Use parts (a) and (b) to evaluate y cos4x dx. 49. (a) Use the reduction formula in Example 6 to show that y /H9266y2 0 sinnx dx − n 2 1 n y /H9266y2 0 sinn22x dx where n > 2 is an integer. (b) Use part (a) to evaluate y /H9266y2 0 sin3x dx and y /H9266y2 0 sin5x dx. (c) Use part (a) to show that, for odd powers of sine, y /H9266y2 0 sin2n11x dx − 2 ? 4 ? 6 ? ∙ ∙ ∙ ? 2n 3 ? 5 ? 7 ? ∙ ∙ ∙ ? s2n 1 1d ; Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to"
+  },
+  {
+    "chunkId": "calculus-p509-c6",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 509,
+    "content": "∙ ∙ ∙ ? 2n 3 ? 5 ? 7 ? ∙ ∙ ∙ ? s2n 1 1d ; Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p510-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 510,
+    "content": "478 Chapter 7 Techniques of Integration 68. A rocket accelerates by burning its onboard fuel, so its mass decreases with time. Suppose the initial mass of the rocket at liftoff (including its fuel) is m, the fuel is consumed at rate r, and the exhaust gases are ejected with constant velocity ve (rel ative to the rocket). A model for the velocity of the rocket at time t is given by the equation vstd − 2tt 2 ve ln m 2 rt m where t is the acceleration due to gravity and t is not too large. If t − 9.8 mys2, m − 30,000 kg, r − 160 kgys, and ve − 3000 mys, find the height of the rocket one minute after liftoff. 69. A particle that moves along a straight line has velocity vstd − t2e2t meters per second after t seconds. How far will it travel during the first t seconds? 70. If f s0d − ts0d − 0 and f 0 and t 0 are continuous, show that y a 0 f sxdt0sxd dx −"
+  },
+  {
+    "chunkId": "calculus-p510-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 510,
+    "content": "per second after t seconds. How far will it travel during the first t seconds? 70. If f s0d − ts0d − 0 and f 0 and t 0 are continuous, show that y a 0 f sxdt0sxd dx − f sadt9sad 2 f 9sadtsad 1 y a 0 f 0sxdtsxd dx 71. Suppose that f s1d − 2, f s4d − 7, f 9s1d − 5, f 9s4d − 3, and f 0 is continuous. Find the value of y 4 1 xf 0sxd dx. 72. (a) Use integration by parts to show that y f sxd dx − xf sxd 2 y xf 9sxd dx (b) If f and t are inverse functions and f 9 is continuous, prove that y b a f sxd dx − bf sbd 2 af sad 2 y f sbd f sad tsyd dy [Hint: Use part (a) and make the substitution y − f sxd.] (c) In the case where f and t are positive functions and b . a . 0, draw a diagram to give a geometric interpre­ tation"
+  },
+  {
+    "chunkId": "calculus-p510-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 510,
+    "content": "tsyd dy [Hint: Use part (a) and make the substitution y − f sxd.] (c) In the case where f and t are positive functions and b . a . 0, draw a diagram to give a geometric interpre­ tation of part (b). (d) Use part (b) to evaluate y e 1 ln x dx. 73. We arrived at Formula 6.3.2, V − y b a 2/H9266x f sxd dx, by using cylindrical shells, but now we can use integration by parts to prove it using the slicing method of Section 6.2, at least for the case where f is one­to­one and therefore has an inverse function t. Use the figure to show that V − /H9266b2d 2 /H9266a2c 2 y d c /H9266ftsydg2 dy Make the substitution y − f sxd and then use integration by parts on the resulting integral to prove that V − y b a 2/H9266x f sxd dx 74. Let In − y /H9266y2 0 sinnx dx. (a) Show that I2n12 < I2n11 < I2n. (b) Use Exercise 50 to show that I2n12 I2n"
+  },
+  {
+    "chunkId": "calculus-p510-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 510,
+    "content": "resulting integral to prove that V − y b a 2/H9266x f sxd dx 74. Let In − y /H9266y2 0 sinnx dx. (a) Show that I2n12 < I2n11 < I2n. (b) Use Exercise 50 to show that I2n12 I2n − 2n 1 1 2n 1 2 (c) Use parts (a) and (b) to show that 2n 1 1 2n 1 2 < I2n11 I2n < 1 and deduce that limn l ` I2n11yI2n − 1. (d) Use part (c) and Exercises 49 and 50 to show that lim n l ` 2 1 ? 2 3 ? 4 3 ? 4 5 ? 6 5 ? 6 7 ? ∙ ∙ ∙ ? 2n 2n 2 1 ? 2n 2n 1 1 − /H9266 2 This formula is usually written as an infinite product: /H9266 2 − 2 1 ? 2 3 ? 4 3 ? 4 5 ? 6 5 ? 6 7 ? ∙ ∙ ∙ and is called the Wallis product. (e) We construct rectangles as follows. Start with a square of area 1 and attach"
+  },
+  {
+    "chunkId": "calculus-p510-c5",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 510,
+    "content": "? 2 3 ? 4 3 ? 4 5 ? 6 5 ? 6 7 ? ∙ ∙ ∙ and is called the Wallis product. (e) We construct rectangles as follows. Start with a square of area 1 and attach rectangles of area 1 alternately beside or on top of the previous rectangle (see the figure). Find the limit of the ratios of width to height of these rectangles. y 0 xab c d x=a x=b y=ƒx=g(y) Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p514-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 514,
+    "content": "482 Chapter 7 Techniques of Integration example 6 Find y tan5/H9258 sec 7/H9258 d/H9258. SOLUtION If we separate a sec2/H9258 factor, as in the preceding example, we are left with a sec5/H9258 factor, which isn’t easily converted to tangent. However, if we separate a sec /H9258 tan /H9258 factor, we can convert the remaining power of tangent to an expression involving only secant using the identity tan2/H9258− sec2/H92582 1. We can then evaluate the integral by substituting u − sec /H9258, so du − sec /H9258 tan /H9258 d/H9258: y tan5/H9258 sec 7/H9258 d/H9258− y tan4/H9258 sec 6/H9258 sec /H9258 tan /H9258 d/H9258 − y ssec2/H92582 1d2 sec6/H9258 sec /H9258 tan /H9258 d/H9258 − y su2 2 1d2 u6 du − y su10 2 2u8 1 u6 d du − u11 11 2 2 u9 9 1 u7 7 1 C − 1 11 sec11/H92582 2 9 sec9/H92581 1 7 sec7/H92581 C n The preceding examples demonstrate strategies for evaluating integrals of the form y tanmx sec nx dx for two cases, which we summarize here. Strategy for Evaluating y"
+  },
+  {
+    "chunkId": "calculus-p514-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 514,
+    "content": "C − 1 11 sec11/H92582 2 9 sec9/H92581 1 7 sec7/H92581 C n The preceding examples demonstrate strategies for evaluating integrals of the form y tanmx sec nx dx for two cases, which we summarize here. Strategy for Evaluating y tanmx secnx dx (a) If the power of secant is even sn − 2k, k > 2d, save a factor of sec2x and use sec2x − 1 1 tan2x to express the remaining factors in terms of tan x: y tanmx sec 2kx dx − y tanmx ssec2xdk21 sec2x dx − y tanmx s1 1 tan2xdk21 sec2x dx Then substitute u − tan x. (b) If the power of tangent is odd sm − 2k 1 1d, save a factor of sec x tan x and use tan2x − sec2x 2 1 to express the remaining factors in terms of sec x: y tan2k11x sec nx dx − y stan2xdk secn21x sec x tan x dx − y ssec2x 2 1dk secn21x sec x tan x dx Then substitute u − sec x. For other cases, the guidelines are not"
+  },
+  {
+    "chunkId": "calculus-p514-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 514,
+    "content": "sec x: y tan2k11x sec nx dx − y stan2xdk secn21x sec x tan x dx − y ssec2x 2 1dk secn21x sec x tan x dx Then substitute u − sec x. For other cases, the guidelines are not as clear ­cut. We may need to use identities, integration by parts, and occasionally a little ingenuity. We will sometimes need to be able to integrate tan x by using the formula established in (5.5.5): y tan x dx − ln | sec x | 1 C Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p514-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 514,
+    "content": "reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p516-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 516,
+    "content": "484 Chapter 7 Techniques of Integration 15. y cot x cos2x dx 16. y tan2x cos3x dx 17. y sin2x sin 2x dx 18. y sin x cos(1 2x) dx 19. y t sin2t dt 20. y x sin3x dx 21. y tan x sec3x dx 22. y tan2 /H9258 sec4 /H9258 d/H9258 23. y tan2x dx 24. y stan2 x 1 tan4 xd dx 25. y tan4x sec6x dx 26. y /H9266y4 0 sec6/H9258 tan6/H9258 d/H9258 27. y tan3x sec x dx 28. y tan5x sec3x dx 29. y tan3 x sec6x dx 30. y /H9266y4 0 tan4t dt 1–49 Evaluate the integral. 1. y sin2x cos 3x dx 2. y sin3/H9258 cos 4 /H9258 d/H9258 3. y /H9266y2 0 sin7/H9258 cos5/H9258 d/H9258 4. y /H9266y2 0 sin5x dx 5. y sin5s2td cos2s2td dt 6. y t cos5 st2d dt 7. y /H9266y2 0 cos2 /H9258 d/H9258 8. y 2/H9266 0 sin2 (1 3/H9258) d/H9258 9. y /H9266 0 cos4s2td dt 10. y /H9266 0 sin2 t cos4 t dt 11. y /H9266y2 0 sin2x cos 2x dx 12."
+  },
+  {
+    "chunkId": "calculus-p516-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 516,
+    "content": "dt 7. y /H9266y2 0 cos2 /H9258 d/H9258 8. y 2/H9266 0 sin2 (1 3/H9258) d/H9258 9. y /H9266 0 cos4s2td dt 10. y /H9266 0 sin2 t cos4 t dt 11. y /H9266y2 0 sin2x cos 2x dx 12. y /H9266y2 0 s2 2 sin /H9258d2 d/H9258 13. y scos /H9258 sin3 /H9258 d/H9258 14. y sin2s1ytd t2 dt Using Formula 1 and solving for the required integral, we get y sec3x dx − 1 2 (sec x tan x 1 ln | sec x 1 tan x |) 1 C n Integrals such as the one in the preceding example may seem very special but they occur frequently in applications of integration, as we will see in Chapter 8. Integrals of the form y cotmx csc nx dx can be found by similar methods because of the identity 1 1 cot2x − csc2x. Finally, we can make use of another set of trigonometric identities: 2 To evaluate the integrals (a) y sin mx cos nx dx, (b) y sin mx sin nx dx, or (c) y cos mx"
+  },
+  {
+    "chunkId": "calculus-p516-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 516,
+    "content": "1 1 cot2x − csc2x. Finally, we can make use of another set of trigonometric identities: 2 To evaluate the integrals (a) y sin mx cos nx dx, (b) y sin mx sin nx dx, or (c) y cos mx cos nx dx, use the corresponding identity: (a) sin A cos B − 1 2 fsinsA 2 Bd 1 sinsA 1 Bdg (b) sin A sin B − 1 2 fcossA 2 Bd 2 cossA 1 Bdg (c) cos A cos B − 1 2 fcossA 2 Bd 1 cossA 1 Bdg Exampl E 9 Evaluate y sin 4x cos 5x dx. SOLUtION This integral could be evaluated using integration by parts, but it’s easier to use the identity in Equation 2(a) as follows: y sin 4x cos 5x dx − y 1 2 fsins2xd 1 sin 9xg dx − 1 2 y s2sin x 1 sin 9xd dx − 1 2 (cos x 2 1 9 cos 9x) 1 C n These product identities are discussed in Appendix D. Copyright 2016 Cengage Learning. All Rights Reserved. May not be"
+  },
+  {
+    "chunkId": "calculus-p516-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 516,
+    "content": "1 2 y s2sin x 1 sin 9xd dx − 1 2 (cos x 2 1 9 cos 9x) 1 C n These product identities are discussed in Appendix D. Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p517-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 517,
+    "content": "Section 7. 2 Trigo no metric Integrals 485 59–60 Use a graph of the integrand to guess the value of the integral. Then use the methods of this section to prove that your guess is correct. 59. y 2/H9266 0 cos3x dx 60. y 2 0 sin 2/H9266x cos 5/H9266x dx 61–64 Find the volume obtained by rotating the region bounded by the curves about the given axis. 61. y − sin x, y − 0, /H9266y2 < x < /H9266; about the x-axis 62. y − sin2 x, y − 0, 0 < x < /H9266; about the x-axis 63. y − sin x, y − cos x, 0 < x < /H9266y4; about y − 1 64. y − sec x, y − cos x, 0 < x < /H9266y3; about y − 21 65. A particle moves on a straight line with velocity function vstd − sin /H9275t cos 2/H9275t. Find its position function s − f std if f s0d − 0. 66. Household electricity is supplied in the form of alternating current that varies from"
+  },
+  {
+    "chunkId": "calculus-p517-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 517,
+    "content": "on a straight line with velocity function vstd − sin /H9275t cos 2/H9275t. Find its position function s − f std if f s0d − 0. 66. Household electricity is supplied in the form of alternating current that varies from 155 V to 2155 V with a frequency of 60 cycles per second (Hz). The voltage is thus given by the equation Estd − 155 sins120/H9266td where t is the time in seconds. V oltmeters read the RMS (root-mean-square) voltage, which is the square root of the average value of fEstdg2 over one cycle. (a) Calculate the RMS voltage of household current. (b) Many electric stoves require an RMS voltage of 220 V . Find the corresponding amplitude A needed for the voltage Estd − A sins120/H9266td. 67–69 Prove the formula, where m and n are positive integers. 67. y /H9266 2/H9266 sin mx cos nx dx − 0 68. y /H9266 2/H9266 sin mx sin nx dx − H 0 /H9266 if m ± n if m − n 69. y /H9266 2/H9266 cos mx cos nx dx −"
+  },
+  {
+    "chunkId": "calculus-p517-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 517,
+    "content": "/H9266 2/H9266 sin mx cos nx dx − 0 68. y /H9266 2/H9266 sin mx sin nx dx − H 0 /H9266 if m ± n if m − n 69. y /H9266 2/H9266 cos mx cos nx dx − H 0 /H9266 if m ± n if m − n 70. A finite Fourier series is given by the sum f sxd − o N n− 1 an sin nx − a1 sin x 1 a2 sin 2x 1 ∙ ∙ ∙ 1 aN sin Nx Show that the mth coefficient am is given by the formula am − 1 /H9266 y /H9266 2/H9266 f sxd sin mx dx ; 31. y tan5x dx 32. y tan2x sec x dx 33. y x sec x tan x dx 34. y sin /H9278 cos3 /H9278 d/H9278 35. y /H9266y2 /H9266y6 cot2x dx 36. y /H9266y2 /H9266y4 cot3x dx 37. y /H9266y2 /H9266y4 cot5/H9278 csc3/H9278 d/H9278 38. y /H9266y2 /H9266y4 csc4/H9258 cot4/H9258 d/H9258 39. y csc x dx 40. y /H9266y3 /H9266y6 csc3x dx 41. y sin 8x cos 5x dx"
+  },
+  {
+    "chunkId": "calculus-p517-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 517,
+    "content": "cot2x dx 36. y /H9266y2 /H9266y4 cot3x dx 37. y /H9266y2 /H9266y4 cot5/H9278 csc3/H9278 d/H9278 38. y /H9266y2 /H9266y4 csc4/H9258 cot4/H9258 d/H9258 39. y csc x dx 40. y /H9266y3 /H9266y6 csc3x dx 41. y sin 8x cos 5x dx 42. y sin 2/H9258 sin 6/H9258 d/H9258 43. y /H9266y2 0 cos 5t cos 10t dt 44. y sin x sec5x dx 45. y /H9266y6 0 s1 1 cos 2x dx 46. y /H9266y4 0 s1 2 cos 4/H9258 d /H9258 47. y 1 2 tan2x sec2x dx 48. y dx cos x 2 1 49. y x tan2x dx 50. If y /H9266y4 0 tan6x sec x dx − I, express the value of y /H9266y4 0 tan8x sec x dx in terms of I. 51–54 Evaluate the indefinite integral. Illustrate, and check that your answer is reasonable, by graphing both the integrand and its antiderivative (taking C − 0d. 51. y x sin2sx2d dx 52. y sin5x cos3x dx 53. y sin 3x sin 6 x dx 54. y sec4 (1 2 x) dx 55. Find the average"
+  },
+  {
+    "chunkId": "calculus-p517-c5",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 517,
+    "content": "graphing both the integrand and its antiderivative (taking C − 0d. 51. y x sin2sx2d dx 52. y sin5x cos3x dx 53. y sin 3x sin 6 x dx 54. y sec4 (1 2 x) dx 55. Find the average value of the function f sxd − sin2x cos 3x on the interval f2/H9266, /H9266g. 56. Evaluate y sin x cos x dx by four methods: (a) the substitution u − cos x (b) the substitution u − sin x (c) the identity sin 2x − 2 sin x cos x (d) integration by parts Explain the different appearances of the answers. 57–58 Find the area of the region bounded by the given curves. 57. y − sin2 x, y − sin3 x, 0 < x < /H9266 58. y − tan x, y − tan2 x, 0 < x < /H9266y4 ; Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review"
+  },
+  {
+    "chunkId": "calculus-p517-c6",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 517,
+    "content": "< /H9266y4 ; Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p533-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 533,
+    "content": "Section 7. 4 Integration of Rational Functions by Partial Fractions 501 31. y 1 x3 2 1 dx 32. y 1 0 x x2 1 4x 1 13 dx 33. y 1 0 x3 1 2x x4 1 4x2 1 3 dx 34. y x5 1 x 2 1 x3 1 1 dx 35. y 5x4 1 7x2 1 x 1 2 xsx2 1 1d2 dx 36. y x4 1 3x2 1 1 x5 1 5x3 1 5x dx 37. y x2 2 3x 1 7 sx2 2 4x 1 6d2 dx 38. y x3 1 2x2 1 3x 2 2 sx2 1 2x 1 2d2 dx 39–52 Make a substitution to express the integrand as a rational function and then evaluate the integral. 39. y dx xsx 2 1 40. y dx 2sx 1 3 1 x 41. y dx x2 1 xsx 42. y 1 0 1 1 1 s 3 x dx 43. y x3 s 3 x2 1 1 dx 44. y dx s1 1 sx d2 45. y 1 sx 2 s 3 x dx"
+  },
+  {
+    "chunkId": "calculus-p533-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 533,
+    "content": "dx x2 1 xsx 42. y 1 0 1 1 1 s 3 x dx 43. y x3 s 3 x2 1 1 dx 44. y dx s1 1 sx d2 45. y 1 sx 2 s 3 x dx fHint: Substitute u − 6sx .g 46. y s1 1 sx x dx 47. y e2x e2x 1 3ex 1 2 dx 48. y sin x cos2 x 2 3 cos x dx 49. y sec2 t tan2 t 1 3 tan t 1 2 dt 50. y ex sex 2 2dse2x 1 1d dx 51. y dx 1 1 ex 52. y cosh t sinh2 t 1 sinh4 t dt 53–54 Use integration by parts, together with the techniques of this section, to evaluate the integral. 53. y lnsx2 2 x 1 2d dx 54. y x tan21x dx 55. Use a graph of f sxd − 1ysx2 2 2x 2 3d to decide whether y 2 0 f sxd dx is positive or negative. Use the graph to give a rough estimate of the value of the integral"
+  },
+  {
+    "chunkId": "calculus-p533-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 533,
+    "content": "55. Use a graph of f sxd − 1ysx2 2 2x 2 3d to decide whether y 2 0 f sxd dx is positive or negative. Use the graph to give a rough estimate of the value of the integral and then use partial fractions to find the exact value. 56. Evaluate y 1 x2 1 k dx by considering several cases for the constant k. ; 1–6 Write out the form of the partial fraction decomposition of the function (as in Example 7). Do not determine the numerical values of the coefficients. 1. (a) 4 1 x s1 1 2xds3 2 xd (b) 1 2 x x3 1 x4 2. (a) x 2 6 x2 1 x 2 6 (b) x2 x2 1 x 1 6 3. (a) 1 x2 1 x4 (b) x3 1 1 x 3 2 3x2 1 2x 4. (a) x4 2 2x3 1 x2 1 2x 2 1 x2 2 2x 1 1 (b) x2 2 1 x3 1 x2 1 x 5. (a) x6 x2 2 4 (b) x4 sx2 2 x 1"
+  },
+  {
+    "chunkId": "calculus-p533-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 533,
+    "content": "3x2 1 2x 4. (a) x4 2 2x3 1 x2 1 2x 2 1 x2 2 2x 1 1 (b) x2 2 1 x3 1 x2 1 x 5. (a) x6 x2 2 4 (b) x4 sx2 2 x 1 1dsx2 1 2d2 6. (a) t6 1 1 t6 1 t3 (b) x5 1 1 sx2 2 xdsx4 1 2x2 1 1d 7–38 Evaluate the integral. 7. y x4 x 2 1 dx 8. y 3t 2 2 t 1 1 dt 9. y 5x 1 1 s2x 1 1dsx 2 1d dx 10. y y sy 1 4ds2y 2 1d dy 11. y 1 0 2 2x2 1 3x 1 1 dx 12. y 1 0 x 2 4 x2 2 5x 1 6 dx 13. y ax x2 2 bx dx 14. y 1 sx 1 adsx 1 bd dx 15. y 0 21 x3 2 4x 1 1 x2 2 3x 1 2 dx 16. y 2 1 x3 1 4x2 1 x 2 1 x3 1 x2 dx 17. y 2 1 4y2 2 7y 2"
+  },
+  {
+    "chunkId": "calculus-p533-c5",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 533,
+    "content": "bd dx 15. y 0 21 x3 2 4x 1 1 x2 2 3x 1 2 dx 16. y 2 1 x3 1 4x2 1 x 2 1 x3 1 x2 dx 17. y 2 1 4y2 2 7y 2 12 ysy 1 2dsy 2 3d dy 18. y 2 1 3x2 1 6x 1 2 x2 1 3x 1 2 dx 19. y 1 0 x2 1 x 1 1 sx 1 1d2sx 1 2d dx 20. y 3 2 xs3 2 5xd s3x 2 1dsx 2 1d2 dx 21. y dt st2 2 1d2 22. y x4 1 9x2 1 x 1 2 x2 1 9 dx 23. y 10 sx 2 1dsx2 1 9d dx 24. y x2 2 x 1 6 x3 1 3x dx 25. y 4x x3 1 x2 1 x 1 1 dx 26. y x2 1 x 1 1 sx2 1 1d2 dx 27. y x3 1 4x 1 3 x4 1 5x2 1 4 dx 28. y x3 1 6x 2 2 x4 1 6x2 dx 29. y x 1 4"
+  },
+  {
+    "chunkId": "calculus-p533-c6",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 533,
+    "content": "26. y x2 1 x 1 1 sx2 1 1d2 dx 27. y x3 1 4x 1 3 x4 1 5x2 1 4 dx 28. y x3 1 6x 2 2 x4 1 6x2 dx 29. y x 1 4 x2 1 2x 1 5 dx 30. y x3 2 2x2 1 2x 2 5 x4 1 4x2 1 3 dx Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p534-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 534,
+    "content": "502 Chapter 7 Techniques of Integration Let P represent the number of female insects in a popula- tion and S the number of sterile males introduced each generation. Let r be the per capita rate of production of females by females, provided their chosen mate is not sterile. Then the female population is related to time t by t − y P 1 S Pfsr 2 1dP 2 Sg dP Suppose an insect population with 10,000 females grows at a rate of r − 1.1 and 900 sterile males are added initially. Evaluate the integral to give an equation relating the female population to time. (Note that the resulting equation can’t be solved explicitly for P.) 68. Factor x4 1 1 as a difference of squares by first adding and subtracting the same quantity. Use this factorization to evaluate y 1ysx4 1 1d dx. 69. (a) Use a computer algebra system to find the partial fraction decomposition of the function f sxd − 4x3 2 27x2 1 5x 2 32 30x5 2 13x4 1 50x3 2 286x2 2 299x 2"
+  },
+  {
+    "chunkId": "calculus-p534-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 534,
+    "content": "1ysx4 1 1d dx. 69. (a) Use a computer algebra system to find the partial fraction decomposition of the function f sxd − 4x3 2 27x2 1 5x 2 32 30x5 2 13x4 1 50x3 2 286x2 2 299x 2 70 (b) Use part (a) to find y f sxd dx (by hand) and com- pare with the result of using the CAS to integrate f directly. Comment on any discrepancy. 70. (a) Find the partial fraction decomposition of the function f sxd − 12x5 2 7x3 2 13x2 1 8 100x6 2 80x5 1 116x4 2 80x3 1 41x2 2 20x 1 4 (b) Use part (a) to find y f sxd dx and graph f and its indefinite integral on the same screen. (c) Use the graph of f to discover the main features of the graph of y f sxd dx. 71. The rational number 22 7 has been used as an approxima- tion to the number /H9266 since the time of Archimedes. Show that y 1 0 x4s1 2 xd4 1 1 x2 dx − 22"
+  },
+  {
+    "chunkId": "calculus-p534-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 534,
+    "content": "y f sxd dx. 71. The rational number 22 7 has been used as an approxima- tion to the number /H9266 since the time of Archimedes. Show that y 1 0 x4s1 2 xd4 1 1 x2 dx − 22 7 2 /H9266 72. (a) Use integration by parts to show that, for any positive integer n, y dx sx2 1 a2dn dx − x 2a2sn 2 1dsx2 1 a2dn21 1 2n 2 3 2a2sn 2 1d y dx sx2 1 a2dn21 (b) Use part (a) to evaluate y dx sx2 1 1d2 and y dx sx2 1 1d3 CAS 57–58 Evaluate the integral by completing the square and using Formula 6. 57. y dx x2 2 2x 58. y 2x 1 1 4x2 1 12x 2 7 dx 59. The German mathematician Karl Weierstrass (1815–1897) noticed that the substitution t − tansxy2d will convert any rational function of sin x and cos x into an ordinary rational function of t. (a) If t − tansxy2d, 2/H9266, x , /H9266, sketch a right triangle or use trigonometric identities to show"
+  },
+  {
+    "chunkId": "calculus-p534-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 534,
+    "content": "t − tansxy2d will convert any rational function of sin x and cos x into an ordinary rational function of t. (a) If t − tansxy2d, 2/H9266, x , /H9266, sketch a right triangle or use trigonometric identities to show that cosS x 2 D− 1 s1 1 t2 and sin S x 2 D− t s1 1 t2 (b) Show that cos x − 1 2 t2 1 1 t2 and sin x − 2t 1 1 t2 (c) Show that dx − 2 1 1 t2 dt 60–63 Use the substitution in Exercise 59 to transform the inte- grand into a rational function of t and then evaluate the integral. 60. y dx 1 2 cos x 61. y 1 3 sin x 2 4 cos x dx 62. y /H9266y2 /H9266y3 1 1 1 sin x 2 cos x dx 63. y /H9266y2 0 sin 2x 2 1 cos x dx 64–65 Find the area of the region under the given curve from 1 to 2. 64. y − 1 x3 1 x 65. y − x2"
+  },
+  {
+    "chunkId": "calculus-p534-c5",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 534,
+    "content": "cos x dx 63. y /H9266y2 0 sin 2x 2 1 cos x dx 64–65 Find the area of the region under the given curve from 1 to 2. 64. y − 1 x3 1 x 65. y − x2 1 1 3x 2 x2 66. Find the volume of the resulting solid if the region under the curve y − 1ysx2 1 3x 1 2d from x − 0 to x − 1 is rotated about (a) the x-axis and (b) the y-axis. 67. One method of slowing the growth of an insect population without using pesticides is to introduce into the population a number of sterile males that mate with fertile females but pro- duce no offspring. (The photo shows a screw-worm fly, the first pest effectively eliminated from a region by this method.) USDA Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content"
+  },
+  {
+    "chunkId": "calculus-p534-c6",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 534,
+    "content": "Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p535-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 535,
+    "content": "SeCtION 7. 5 Strategy for Integration 503 y f sxd x2sx 1 1d3 dx is a rational function, find the value of f 9s0d. 75. If a ± 0 and n is a positive integer, find the partial fraction decomposition of f sxd − 1 xnsx 2 ad [Hint: First find the coefficient of 1ysx 2 ad. Then sub- tract the resulting term and simplify what is left.] 73. Suppose that F, G, and Q are polynomials and Fsxd Qsxd − Gsxd Qsxd for all x except when Qsxd − 0. Prove that Fsxd − Gsxd for all x. [Hint: Use continuity.] 74. If f is a quadratic function such that f s0d − 1 and As we have seen, integration is more challenging than differentiation. In finding the deriv ative of a function it is obvious which differentiation formula we should apply. But it may not be obvious which technique we should use to integrate a given function. Until now individual techniques have been applied in each section. For instance, we usu ally used substitution in Exercises 5.5, integration"
+  },
+  {
+    "chunkId": "calculus-p535-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 535,
+    "content": "we should apply. But it may not be obvious which technique we should use to integrate a given function. Until now individual techniques have been applied in each section. For instance, we usu ally used substitution in Exercises 5.5, integration by parts in Exercises 7.1, and par- tial frac tions in Exercises 7.4. But in this section we present a collection of miscella- neous integrals in random order and the main challenge is to recognize which technique or formula to use. No hard and fast rules can be given as to which method applies in a given situation, but we give some advice on strategy that you may find useful. A prerequisite for applying a strategy is a knowledge of the basic integration formu- las. In the following table we have collected the integrals from our previous list together with several additional formulas that we have learned in this chapter. Table of Integration Formulas Constants of integration have been omitted. 1. y xn dx − xn11 n 1 1 sn ± 21d 2. y 1 x dx − ln |"
+  },
+  {
+    "chunkId": "calculus-p535-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 535,
+    "content": "several additional formulas that we have learned in this chapter. Table of Integration Formulas Constants of integration have been omitted. 1. y xn dx − xn11 n 1 1 sn ± 21d 2. y 1 x dx − ln | x | 3. y ex dx − ex 4. y bx dx − bx ln b 5. y sin x dx − 2cos x 6. y cos x dx − sin x 7. y sec2x dx − tan x 8. y csc2x dx − 2cot x 9. y sec x tan x dx − sec x 10. y csc x cot x dx − 2csc x 11. y sec x dx − ln | sec x 1 tan x | 12. y csc x dx − ln | csc x 2 cot x | 13. y tan x dx − ln | sec x | 14. y cot x dx − ln | sin x | 15. y sinh x dx − cosh x 16. y cosh x dx − sinh x 17. y dx x2 1 a2 − 1"
+  },
+  {
+    "chunkId": "calculus-p535-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 535,
+    "content": "ln | sec x | 14. y cot x dx − ln | sin x | 15. y sinh x dx − cosh x 16. y cosh x dx − sinh x 17. y dx x2 1 a2 − 1 a tan21 S x a D 18. y dx sa2 2 x2 − sin21 S x a D, a . 0 *19. y dx x2 2 a2 − 1 2a ln Z x 2 a x 1 a Z *20. y dx sx2 6 a2 − ln | x 1 sx2 6 a2 | Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p535-c5",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 535,
+    "content": "affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p536-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 536,
+    "content": "504 Chapter 7 Techniques of Integration Most of these formulas should be memorized. It is useful to know them all, but the ones marked with an asterisk need not be memorized since they are easily derived. For- mula 19 can be avoided by using partial fractions, and trigonometric substitutions can be used in place of Formula 20. Once you are armed with these basic integration formulas, if you don’t immediately see how to attack a given integral, you might try the following four-step strategy. 1. Simplify the Integrand if Possible Sometimes the use of algebraic manipulation or trigonometric identities will simplify the integrand and make the method of integration obvious. Here are some examples: y sx (1 1 sx ) dx − y (sx 1 x) dx y tan /H9258 sec2/H9258 d/H9258− y sin /H9258 cos /H9258 cos2/H9258 d/H9258 − y sin /H9258 cos /H9258 d/H9258− 1 2 y sin 2/H9258 d/H9258 y ssin x 1 cos xd2 dx − y ssin2x 1 2 sin x cos x 1 cos2xd dx − y s1 1 2 sin x cos xd"
+  },
+  {
+    "chunkId": "calculus-p536-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 536,
+    "content": "y sin /H9258 cos /H9258 d/H9258− 1 2 y sin 2/H9258 d/H9258 y ssin x 1 cos xd2 dx − y ssin2x 1 2 sin x cos x 1 cos2xd dx − y s1 1 2 sin x cos xd dx 2. Look for an Obvious Substitution Try to find some function u − tsxd in the integrand whose differential du − t9sxd dx also occurs, apart from a constant factor. For instance, in the integral y x x2 2 1 dx we notice that if u − x2 2 1, then du − 2x dx. Therefore we use the substitution u − x2 2 1 instead of the method of partial fractions. 3. Classify the Integrand According to Its Form If Steps 1 and 2 have not led to the solu- tion, then we take a look at the form of the integrand f sxd. (a) Trigonometric functions. If f sxd is a product of powers of sin x and cos x, of tan x and sec x, or of cot x and csc x, then we use the"
+  },
+  {
+    "chunkId": "calculus-p536-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 536,
+    "content": "form of the integrand f sxd. (a) Trigonometric functions. If f sxd is a product of powers of sin x and cos x, of tan x and sec x, or of cot x and csc x, then we use the substitutions recommended in Section 7.2. (b) Rational functions. If f is a rational function, we use the procedure of Section 7.4 involving partial fractions. (c) Integration by parts. If f sxd is a product of a power of x (or a polynomial) and a transcendental function (such as a trigonometric, exponential, or logarithmic func- tion), then we try integration by parts, choosing u and dv according to the advice given in Section 7.1. If you look at the functions in Exercises 7.1, you will see that most of them are the type just described. (d) Radicals. Particular kinds of substitutions are recommended when certain radicals appear. (i) If s6x2 6 a2 occurs, we use a trigonometric substitution according to the table in Section 7.3. (ii) If sn ax 1 b occurs, we use the rationalizing substitution u − sn ax"
+  },
+  {
+    "chunkId": "calculus-p536-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 536,
+    "content": "are recommended when certain radicals appear. (i) If s6x2 6 a2 occurs, we use a trigonometric substitution according to the table in Section 7.3. (ii) If sn ax 1 b occurs, we use the rationalizing substitution u − sn ax 1 b . More generally, this sometimes works for sn tsxd . Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p537-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 537,
+    "content": "SeCtion 7. 5 Strategy for Integration 505 4. Try Again If the first three steps have not produced the answer, remember that there are basically only two methods of integration: substitution and parts. (a) Try substitution. Even if no substitution is obvious (Step 2), some inspiration or ingenuity (or even desperation) may suggest an appropriate substitution. (b) Try parts. Although integration by parts is used most of the time on products of the form described in Step 3(c), it is sometimes effective on single functions. Look- ing at Section 7.1, we see that it works on tan21x, sin21x, and ln x, and these are all inverse functions. (c) Manipulate the integrand. Algebraic manipulations (perhaps rationalizing the denominator or using trigonometric identities) may be useful in transforming the integral into an easier form. These manipulations may be more substantial than in Step 1 and may involve some ingenuity. Here is an example: y dx 1 2 cos x − y 1 1 2 cos x ? 1 1 cos x 1 1 cos x dx − y 1 1 cos x"
+  },
+  {
+    "chunkId": "calculus-p537-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 537,
+    "content": "Step 1 and may involve some ingenuity. Here is an example: y dx 1 2 cos x − y 1 1 2 cos x ? 1 1 cos x 1 1 cos x dx − y 1 1 cos x 1 2 cos2x dx − y 1 1 cos x sin2x dx − y Scsc2x 1 cos x sin2x D dx (d) Relate the problem to previous problems. When you have built up some expe rience in integration, you may be able to use a method on a given integral that is similar to a method you have already used on a previous integral. Or you may even be able to express the given integral in terms of a previous one. For instance, y tan2x sec x dx is a challenging integral, but if we make use of the identity tan2x − sec2x 2 1, we can write y tan2x sec x dx − y sec3x dx 2 y sec x dx and if y sec3x dx has previously been evaluated (see Example 7.2.8), then that cal- culation can be"
+  },
+  {
+    "chunkId": "calculus-p537-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 537,
+    "content": "tan2x − sec2x 2 1, we can write y tan2x sec x dx − y sec3x dx 2 y sec x dx and if y sec3x dx has previously been evaluated (see Example 7.2.8), then that cal- culation can be used in the present problem. (e) Use several methods. Sometimes two or three methods are required to evaluate an integral. The evaluation could involve several successive substitutions of different types, or it might combine integration by parts with one or more substitutions. In the following examples we indicate a method of attack but do not fully work out the integral. ExAmPLE 1 y tan3x cos3x dx In Step 1 we rewrite the integral: y tan3x cos3x dx − y tan3x sec 3x dx The integral is now of the form y tanmx secnx dx with m odd, so we can use the advice in Section 7.2. Alternatively, if in Step 1 we had written y tan3x cos3x dx − y sin3x cos3x 1 cos3x dx − y sin3x cos6x dx Copyright 2016 Cengage Learning. All Rights Reserved. May not be"
+  },
+  {
+    "chunkId": "calculus-p537-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 537,
+    "content": "use the advice in Section 7.2. Alternatively, if in Step 1 we had written y tan3x cos3x dx − y sin3x cos3x 1 cos3x dx − y sin3x cos6x dx Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p546-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 546,
+    "content": "514 Chapter 7 Techniques of Integration (b) Based on the pattern of your responses in part (a), guess the value of the integral y 1 sx 1 adsx 1 bd dx if a ± b. What if a − b? (c) Check your guess by asking your CAS to evaluate the integral in part (b). Then prove it using partial fractions. 2. (a) Use a computer algebra system to evaluate the following integrals. (i) y sin x cos 2 x dx (ii) y sin 3x cos 7x dx (iii) y sin 8x cos 3 x dx (b) Based on the pattern of your responses in part (a), guess the value of the integral y sin ax cos bx dx (c) Check your guess with a CAS. Then prove it using the techniques of Section 7.2. For what values of a and b is it valid? 3. (a) Use a computer algebra system to evaluate the following integrals. (i) y ln x dx (ii) y x ln x dx (iii) y x2 ln x dx (iv) y x3 ln x dx"
+  },
+  {
+    "chunkId": "calculus-p546-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 546,
+    "content": "and b is it valid? 3. (a) Use a computer algebra system to evaluate the following integrals. (i) y ln x dx (ii) y x ln x dx (iii) y x2 ln x dx (iv) y x3 ln x dx (v) y x7 ln x dx (b) Based on the pattern of your responses in part (a), guess the value of y xn ln x dx (c) Use integration by parts to prove the conjecture that you made in part (b). For what val- ues of n is it valid? 4. (a) Use a computer algebra system to evaluate the following integrals. (i) y xe x dx (ii) y x2ex dx (iii) y x3ex dx (iv) y x4ex dx (v) y x5ex dx (b) Based on the pattern of your responses in part (a), guess the value of y x6ex dx. Then use your CAS to check your guess. (c) Based on the patterns in parts (a) and (b), make a conjecture as to the value of the integral y xnex dx when n is a positive integer. (d) Use"
+  },
+  {
+    "chunkId": "calculus-p546-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 546,
+    "content": "dx. Then use your CAS to check your guess. (c) Based on the patterns in parts (a) and (b), make a conjecture as to the value of the integral y xnex dx when n is a positive integer. (d) Use mathematical induction to prove the conjecture you made in part (c). There are two situations in which it is impossible to find the exact value of a definite integral. The first situation arises from the fact that in order to evaluate y b a f sxd dx using the Fun damental Theorem of Calculus we need to know an antiderivative of f. Sometimes, however, it is difficult, or even impossible, to find an antiderivative (see Section 7.5). For Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any"
+  },
+  {
+    "chunkId": "calculus-p546-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 546,
+    "content": "rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p569-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 569,
+    "content": "chapter 7 Review 537 5. State the rules for approximating the definite integral yb a f sxd dx with the Midpoint Rule, the Trapezoidal Rule, and Simpson’s Rule. Which would you expect to give the best estimate? How do you approximate the error for each rule? 6. Define the following improper integrals. (a) y ` a f sxd dx (b) y b 2` f sxd dx (c) y ` 2` f sxd dx 7. Define the improper integral yb a f sxd dx for each of the following cases. (a) f has an infinite discontinuity at a. (b) f has an infinite discontinuity at b. (c) f has an infinite discontinuity at c, where a , c , b. 8. State the Comparison Theorem for improper integrals. 1. State the rule for integration by parts. In practice, how do you use it? 2. How do you evaluate y sinmx cos nx dx if m is odd? What if n is odd? What if m and n are both even? 3. If the expression sa2 2 x2 occurs in an integral,"
+  },
+  {
+    "chunkId": "calculus-p569-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 569,
+    "content": "use it? 2. How do you evaluate y sinmx cos nx dx if m is odd? What if n is odd? What if m and n are both even? 3. If the expression sa2 2 x2 occurs in an integral, what substi tution might you try? What if sa2 1 x2 occurs? What if sx2 2 a2 occurs? 4. What is the form of the partial fraction decomposition of a rational function PsxdyQsxd if the degree of P is less than the degree of Q and Qsxd has only distinct linear factors? What if a linear factor is repeated? What if Qsxd has an irreducible quadratic factor (not repeated)? What if the quadratic factor is repeated? 7 Review Determine whether the statement is true or false. If it is true, explain why. If it is false, explain why or give an example that disproves the statement. 1. xsx2 1 4d x2 2 4 can be put in the form A x 1 2 1 B x 2 2 . 2. x2 1 4 xsx2 2 4d can be put in"
+  },
+  {
+    "chunkId": "calculus-p569-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 569,
+    "content": "an example that disproves the statement. 1. xsx2 1 4d x2 2 4 can be put in the form A x 1 2 1 B x 2 2 . 2. x2 1 4 xsx2 2 4d can be put in the form A x 1 B x 1 2 1 C x 2 2 . 3. x2 1 4 x2sx 2 4d can be put in the form A x2 1 B x 2 4 . 4. x2 2 4 xsx2 1 4d can be put in the form A x 1 B x2 1 4 . 5. y 4 0 x x2 2 1 dx − 1 2 ln 15 6. y ` 1 1 xs2 dx is convergent. 7. If f is continuous, then y ` 2` f sxd dx − limt l ` yt 2t f sxd dx. 8. The Midpoint Rule is always more accurate than the Trape- zoidal Rule. 9. (a) Every elementary function has an elementary derivative. (b) Every elementary function has an elementary antiderivative. 10. If f is continuous on f0, `d and"
+  },
+  {
+    "chunkId": "calculus-p569-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 569,
+    "content": "dx. 8. The Midpoint Rule is always more accurate than the Trape- zoidal Rule. 9. (a) Every elementary function has an elementary derivative. (b) Every elementary function has an elementary antiderivative. 10. If f is continuous on f0, `d and y` 1 f sxd dx is convergent, then y` 0 f sxd dx is convergent. 11. If f is a continuous, decreasing function on f1, `d and limx l ` f sxd − 0, then y ` 1 f sxd dx is convergent. 12. If y` a f sxd dx and y ` a tsxd dx are both convergent, then y` a f f sxd 1 tsxdg dx is convergent. 13. If y ` a f sxd dx and y ` a tsxd dx are both divergent, then y ` a f f sxd 1 tsxdg dx is divergent. 14. If f sxd < tsxd and y ` 0 tsxd dx diverges, then y ` 0 f sxd dx also diverges. TRU e-FALS e QUiz concep T check Answers to the Concept Check can be found on the back endpapers."
+  },
+  {
+    "chunkId": "calculus-p569-c5",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 569,
+    "content": "If f sxd < tsxd and y ` 0 tsxd dx diverges, then y ` 0 f sxd dx also diverges. TRU e-FALS e QUiz concep T check Answers to the Concept Check can be found on the back endpapers. eXeRciSeS Note: Additional practice in techniques of integration is provided in Exercises 7.5. 1–40 Evaluate the integral. 1. y 2 1 sx 1 1d2 x dx 2. y 2 1 x sx 1 1d2 dx 3. y esin x sec x dx 4. y /H9266y6 0 t sin 2t dt 5. y dt 2t2 1 3t 1 1 6. y 2 1 x5 ln x dx 7. y /H9266y2 0 sin3 /H9258 cos2/H9258 d/H9258 8. y dx sex 2 1 Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content"
+  },
+  {
+    "chunkId": "calculus-p569-c6",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 569,
+    "content": "to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p574-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 574,
+    "content": "542 (b) Make a guess as to the value of the limit lim n l ` y 1 0 f sxd sin nx dx based on graphs of the integrand. (c) Using integration by parts, confirm the guess that you made in part (b). [Use the fact that, since f 9 is continuous, there is a constant M such that | f 9sxd | < M for 0 < x < 1.] 1\u00031\u0003 . If 0 , a , b, find lim t l 0 Hy 1 0 fbx 1 as1 2 xdgt dxJ 1yt 1\u00032\u0003 . Graph f sxd − sinsex d and use the graph to estimate the value of t such that yt11 t f sxd dx is a maximum. Then find the exact value of t that maximizes this integral. 1\u0003 3. Evaluate y ` 21S x4 1 1 x6 D 2 dx. 1\u00034\u0003 . Evaluate y stan x dx. 1\u00035\u0003. The circle with radius 1 shown in the figure touches the curve y − | 2x | twice. Find the area of the region that"
+  },
+  {
+    "chunkId": "calculus-p574-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 574,
+    "content": "x4 1 1 x6 D 2 dx. 1\u00034\u0003 . Evaluate y stan x dx. 1\u00035\u0003. The circle with radius 1 shown in the figure touches the curve y − | 2x | twice. Find the area of the region that lies between the two curves. 1\u00036\u0003 . A rocket is fired straight up, burning fuel at the constant rate of b kilograms per second. Let v − vstd be the velocity of the rocket at time t and suppose that the velocity u of the exhaust gas is constant. Let M − Mstd be the mass of the rocket at time t and note that M decreases as the fuel burns. If we neglect air resistance, it follows from Newton’s Second Law that F − M dv dt 2 ub where the force F − 2Mt. Thus M dv dt 2 ub − 2Mt Let M1 be the mass of the rocket without fuel, M2 the initial mass of the fuel, and M0 − M1 1 M2. Then, until the fuel runs out at time t − M2yb, the mass"
+  },
+  {
+    "chunkId": "calculus-p574-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 574,
+    "content": "2 ub − 2Mt Let M1 be the mass of the rocket without fuel, M2 the initial mass of the fuel, and M0 − M1 1 M2. Then, until the fuel runs out at time t − M2yb, the mass is M − M0 2 bt. (a) Substitute M − M0 2 bt into Equation 1 and solve the resulting equation for v. Use the initial condition vs0d − 0 to evaluate the constant. (b) Determine the velocity of the rocket at time t − M2yb. This is called the burnout velocity. (c) Determine the height of the rocket y − ystd at the burnout time. (d) Find the height of the rocket at any time t. ; FIGURE FoR pRobLEm 1\u00035\u0003 y=| 2x | y 0 x 1\u0003 Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience."
+  },
+  {
+    "chunkId": "calculus-p574-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 574,
+    "content": "scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p596-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 596,
+    "content": "564 Chapter 8 Further Applications of Integration so Formulas 8 give x − 1 A y /H9266y2 0 x fsxd dx − y /H9266y2 0 x cos x dx − x sin xg0 /H9266y2 2 y /H9266y2 0 sin x dx (by integration by parts) − /H9266 2 2 1 y − 1 A y /H9266y2 0 1 2 f f sxdg2 dx − 1 2 y /H9266y2 0 cos2x dx − 1 4 y /H9266y2 0 s1 1 cos 2xd dx − 1 4 fx 1 1 2 sin 2xg0 /H9266y2 − /H9266 8 The centroid is (1 2 /H92662 1, 1 8 /H9266) and is shown in Figure 12. n If the region 5 lies between two curves y − f sxd and y − tsxd, where f sxd > tsxd, as illustrated in Figure 13, then the same sort of argument that led to Formulas 8 can be used to show that the centroid of 5 is sx, yd, where x − 1 A y b a xf f sxd 2 tsxdg dx y − 1 A"
+  },
+  {
+    "chunkId": "calculus-p596-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 596,
+    "content": "same sort of argument that led to Formulas 8 can be used to show that the centroid of 5 is sx, yd, where x − 1 A y b a xf f sxd 2 tsxdg dx y − 1 A y b a 1 2 hf f sxdg2 2 ftsxdg2 j dx 9\u0003 (See Exercise 51.) Exampl E 6 Find the centroid of the region bounded by the line y − x and the parabola y − x2. SOLUtION The region is sketched in Figure 14. We take f sxd − x, tsxd − x2, a − 0, and b − 1 in Formulas 9. First we note that the area of the region is A − y 1 0 sx 2 x2 d dx − x2 2 2 x3 3 G 0 1 − 1 6 Therefore x − 1 A y 1 0 xf f sxd 2 tsxdg dx − 1 1 6 y 1 0 xsx 2 x2 d dx − 6 y 1 0 sx2 2 x3 d dx − 6F x3 3 2 x4 4"
+  },
+  {
+    "chunkId": "calculus-p596-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 596,
+    "content": "1 A y 1 0 xf f sxd 2 tsxdg dx − 1 1 6 y 1 0 xsx 2 x2 d dx − 6 y 1 0 sx2 2 x3 d dx − 6F x3 3 2 x4 4 G 0 1 − 1 2 y − 1 A y 1 0 1 2 hf f sxdg2 2 ftsxdg2 j dx − 1 1 6 y 1 0 1 2 sx2 2 x4 d dx − 3F x3 3 2 x5 5 G 0 1 − 2 5 The centroid is s1 2 , 2 5 d. n FIGURE 1\u00032\u0003 x y 0 ” -1, ’π 8 π 2 π 2 y=cos x FIGURE 1\u00034\u0003 x y 0 ” , ’2 5 1 2 y=x y=≈ (1, 1) FIGURE 1\u00033\u0003 xi x y 0 ab /H5118 y=ƒ y=© 1 2Ci ”xi, /H20851f(xi)+g(xi)/H20852’ Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review"
+  },
+  {
+    "chunkId": "calculus-p596-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 596,
+    "content": "2Ci ”xi, /H20851f(xi)+g(xi)/H20852’ Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it. www.elsolucionario.org"
+  },
+  {
+    "chunkId": "calculus-p609-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 609,
+    "content": "SeCtION 8.5 Probability 577 To evaluate this integral we use integration by parts, with u − t and dv − ce2ct dt, so du − dt and v − 2e2ct: y ` 0 tce2ct dt − lim x l ` y x 0 tce2ct dt − lim x l ` S2te2ct g x 0 1 y x 0 e2ct dtD − lim x l `S2xe2cx 1 1 c 2 e2cx c D− 1 c The mean is /H9262− 1yc, so we can rewrite the probability density function as f std − H 0 /H926221e2ty/H9262 if t , 0 if t > 0 n Exampl E 4 Suppose the average waiting time for a customer’s call to be answered by a company representative is five minutes. (a) Find the probability that a call is answered during the first minute, assuming that an exponential distribution is appropriate. (b) Find the probability that a customer waits more than five minutes to be answered. SOLUtION (a) We are given that the mean of the exponential distribution is /H9262− 5 min and so, from the"
+  },
+  {
+    "chunkId": "calculus-p609-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 609,
+    "content": "an exponential distribution is appropriate. (b) Find the probability that a customer waits more than five minutes to be answered. SOLUtION (a) We are given that the mean of the exponential distribution is /H9262− 5 min and so, from the result of Example 3, we know that the probability density function is f std − H 0 0.2e2ty5 if t , 0 if t > 0 where t is measured in minutes. Thus the probability that a call is answered during the first minute is Ps0 < T < 1d − y 1 0 f std dt − y 1 0 0.2e2ty5 dt − 0.2s25de2ty5g0 1 − 1 2 e21y5 < 0.1813 So about 18% of customers’ calls are answered during the first minute. (b) The probability that a customer waits more than five minutes is PsT . 5d − y ` 5 f std dt − y ` 5 0.2e2ty5 dt − lim x l ` y x 5 0.2e2ty5 dt − lim x l ` se21 2 e2xy5 d − 1 e 2 0 < 0.368 About 37%"
+  },
+  {
+    "chunkId": "calculus-p609-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 609,
+    "content": "y ` 5 f std dt − y ` 5 0.2e2ty5 dt − lim x l ` y x 5 0.2e2ty5 dt − lim x l ` se21 2 e2xy5 d − 1 e 2 0 < 0.368 About 37% of customers wait more than five minutes before their calls are answered. n The limit of the first term is 0 by l’Hospital’s Rule. Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p1027-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 1027,
+    "content": "SeCtIon 15.1 Double Integrals over Rectangles 995 example 5\u0003 Evaluate the double integral yyR sx 2 3y2 d dA, where R − hsx, yd | 0 < x < 2, 1 < y < 2j. (Compare with Example 3.) SoLUtIon 1 Fubini’s Theorem gives y R y sx 2 3y2 d dA − y 2 0 y 2 1 sx 2 3y2 d dy dx − y 2 0 fxy 2 y3gy−1 y−2 dx − y 2 0 sx 2 7d dx − x2 2 2 7xG 0 2 − 212 SoLUtIon 2 Again applying Fubini’s Theorem, but this time integrating with respect to x first, we have y R y sx 2 3y2 d dA − y 2 1 y 2 0 sx 2 3y2 d dx dy − y 2 1 F x2 2 2 3xy 2 G x−0 x−2 dy − y 2 1 s2 2 6y2 d dy − 2y 2 2y3g1 2 − 212 ■ R0 _120 0.5 1 1.5 2 2 1 0 y x z _4 _8 z=x-3¥ example 6\u0003 Evaluate yyR y"
+  },
+  {
+    "chunkId": "calculus-p1027-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 1027,
+    "content": "x−0 x−2 dy − y 2 1 s2 2 6y2 d dy − 2y 2 2y3g1 2 − 212 ■ R0 _120 0.5 1 1.5 2 2 1 0 y x z _4 _8 z=x-3¥ example 6\u0003 Evaluate yyR y sinsxyd dA, where R − f1, 2g 3 f0, /H9266g. SoLUtIon If we first integrate with respect to x, we get y R y y sinsxyd dA − y /H9266 0 y 2 1 y sinsxyd dx dy − y /H9266 0 f2cossxydgx−1 x−2 dy − y /H9266 0 s2cos 2y 1 cos yd dy − 21 2 sin 2y 1 sin yg0 /H9266 − 0 ■ Note If we reverse the order of integration and first integrate with respect to y in Example 6, we get y R y y sinsxyd dA − y 2 1 y /H9266 0 y sinsxyd dy dx but this order of integration is much more difficult than the method given in the example because it involves integration by parts twice. Therefore, when we evaluate double inte- grals it is wise to choose the"
+  },
+  {
+    "chunkId": "calculus-p1027-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 1027,
+    "content": "y sinsxyd dy dx but this order of integration is much more difficult than the method given in the example because it involves integration by parts twice. Therefore, when we evaluate double inte- grals it is wise to choose the order of integration that gives simpler integrals. FIGURE 13 For a function f that takes on both positive and negative values, yyR f sx, yd dA is a difference of volumes: V1 2 V2, where V1 is the volume above R and below the graph of f , and V2 is the volume below R and above the graph. The fact that the integral in Example 6 is 0 means that these two volumes V1 and V2 are equal. (See Figure 14.) z=y sin(xy) 1 0 _1 y10 32 2 1 x z FIGURE 14 Notice the negative answer in Example 5; nothing is wrong with that. The function f is not a positive function, so its integral doesn’t repre- sent a volume. From Figure 13 we see that f is always negative on R, so the value of the"
+  },
+  {
+    "chunkId": "calculus-p1027-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 1027,
+    "content": "Example 5; nothing is wrong with that. The function f is not a positive function, so its integral doesn’t repre- sent a volume. From Figure 13 we see that f is always negative on R, so the value of the integral is the negative of the volume that lies above the graph of f and below R. Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  },
+  {
+    "chunkId": "calculus-p1355-c1",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 1355,
+    "content": "index A141 constraint, 971, 976 consumer surplus, 569 continued fraction expansion, 706 continuity of a function, 114, 849 of a function of three variables, 909, 910 of a function of two variables, 907, 908, 910 on an interval, 117 from the left, 116 from the right, 116 of a vector function, 849 continuous compounding of interest, 241, 313 continuous random variable, 573 contour curves, 893 contour map, 894, 895, 921 convergence absolute, 737 conditional, 738 of an improper integral, 528, 531 interval of, 749 radius of, 749 of a sequence, 696 of a series, 708 convergent improper integral, 528, 531 convergent sequence, 696 convergent series, 708 properties of, 713 conversion of coordinates cylindrical to rectangular, 1040 rectangular to cylindrical, 1040 rectangular to spherical, 1046 cooling tower, hyperbolic, 839 coordinate axes, 792, A11 coordinate planes, 792 coordinate system, A2 Cartesian, A11 cylindrical, 1040 polar, 658 retangular, A11 spherical, 1045 three-dimensional rectangular, 792, 793 coplanar vectors, 820 Coriolis acceleration, 883 Cornu’s spiral, 656 cosine function, A26 derivative of, 192 graph of, 31, A31 power series for, 764, 766 cost function, 231, 335"
+  },
+  {
+    "chunkId": "calculus-p1355-c2",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 1355,
+    "content": "cylindrical, 1040 polar, 658 retangular, A11 spherical, 1045 three-dimensional rectangular, 792, 793 coplanar vectors, 820 Coriolis acceleration, 883 Cornu’s spiral, 656 cosine function, A26 derivative of, 192 graph of, 31, A31 power series for, 764, 766 cost function, 231, 335 critical number, 280 critical point(s), 960, 970 critically damped vibration, 1170 cross product, 814, 815 direction of, 816 geometric characterization of, 817 length of, 817, 818 magnitude of, 817 properties of, 816, 819 cross-section, 438 cross-section of a surface, 834 cubic function, 28 curl of a vector field, 1103 current, 227 curvature, 657, 864, 865, 875 curvature of a plane parametric curve, 869 curve(s) asymptotic, 323 Bézier, 643, 657 boundary, 1134 bullet-nose, 205 cissoid of Diocles, 667 closed, 1089 Cornu’s spiral, 656 demand, 569 devil’s, 215 dog saddle, 902 epicycloid, 649 equipotential, 902 grid, 1112 helix, 849 length of, 544, 861 level, 893, 897 long-bow, 691 monkey saddle, 902 orientation of, 1080, 1096 orthogonal, 216 ovals of Cassini, 669 parametric, 640, 849 piecewise-smooth, 1076 polar, 660 serpentine, 188 simple, 1090 smooth, 544, 863 space, 849 strophoid, 673, 691 swallotail catastrophe,"
+  },
+  {
+    "chunkId": "calculus-p1355-c3",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 1355,
+    "content": "861 level, 893, 897 long-bow, 691 monkey saddle, 902 orientation of, 1080, 1096 orthogonal, 216 ovals of Cassini, 669 parametric, 640, 849 piecewise-smooth, 1076 polar, 660 serpentine, 188 simple, 1090 smooth, 544, 863 space, 849 strophoid, 673, 691 swallotail catastrophe, 648 toroidal spiral, 851 trochoid, 647 twisted cubic, 851 witch of Maria Agnesi, 647 curve fitting, 25 curve-sketching procedure, 315 cusp, 645 cycloid, 643 cylinder, 438, 794, 834 parabolic, 834 parametrization of, 1114 cylindrical coordinate system, 1040 conversion equations for, 1040 triple integrals in, 1042 cylindrical coordinates, 1040 cylindrical shell, 449 damped vibration, 1169 damping constant, 1169 damping force, 1169, 1171 decay, law of natural, 237 decay, radioactive, 239 decreasing function, 19 decreasing sequence, 700 definite integral, 378, 988 properties of, 385 Substitution Rule for, 416 of a vector function, 859 definite integration by parts, 472, 474, 475 by substitution, 416 degree of a polynomial, 27 del ( =), 949, 951 delta (D) notation, 145 demand curve, 336, 569 demand function, 336, 569 De Moivre, Abraham, A61 De Moivre’s Theorem, A61 density of a lamina, 1016 linear, 226, 406 liquid,"
+  },
+  {
+    "chunkId": "calculus-p1355-c4",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 1355,
+    "content": "416 degree of a polynomial, 27 del ( =), 949, 951 delta (D) notation, 145 demand curve, 336, 569 demand function, 336, 569 De Moivre, Abraham, A61 De Moivre’s Theorem, A61 density of a lamina, 1016 linear, 226, 406 liquid, 558 mass vs. weight, 558 of a solid, 1035 dependent variable, 10, 888, 940 derivative(s), 140, 144, 152, 257 of a composite function, 198 of a constant function, 172 directional, 946, 947, 948, 950, 951 domain of, 153 of exponential functions, 179, 202, A54, A55 as a function, 152 higher, 158 higher partial, 918 of hyperbolic functions, 261 of an integral, 393 of an inverse function, 218 of inverse trigonometric functions, 213, 214 left-hand, 165 of logarithmic functions, 218, A51, A54 normal, 1110 notation, 155 notation for partial, 914 partial, 913, 914 of a polynomial, 172 Copyright 2016 Cengage Learning. All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does"
+  },
+  {
+    "chunkId": "calculus-p1355-c5",
+    "title": "Calculus: Early Transcendentals, 8th Edition",
+    "page": 1355,
+    "content": "All Rights Reserved. May not be copied, scanned, or duplicated, in whole or in part. Due to electronic rights, some third party content may be suppressed from the eBook and/or eChapter(s). Editorial review has deemed that any suppressed content does not materially affect the overall learning experience. Cengage Learning reserves the right to remove additional content at any time if subsequent rights restrictions require it."
+  }
+]
