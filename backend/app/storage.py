@@ -60,6 +60,18 @@ def init_db() -> None:
                 updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY(course, topic)
             );
+
+            CREATE TABLE IF NOT EXISTS calendar_events (
+                id TEXT PRIMARY KEY,
+                course TEXT NOT NULL,
+                topic TEXT NOT NULL,
+                title TEXT NOT NULL,
+                event_type TEXT NOT NULL,
+                due_date TEXT NOT NULL,
+                source TEXT NOT NULL DEFAULT 'Personal calendar',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
             """
         )
 
@@ -201,6 +213,21 @@ def update_topic_mastery(course: str, topic: str, mastery: int) -> int:
     return mastery
 
 
+def list_topic_mastery(limit: int = 100) -> list[dict]:
+    init_db()
+    with _connect() as connection:
+        rows = connection.execute(
+            """
+            SELECT course, topic, mastery, updated_at
+            FROM topic_mastery
+            ORDER BY updated_at DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+    return [_row_to_dict(row) for row in rows]
+
+
 def save_quiz_attempt(
     course: str,
     topic: str,
@@ -243,6 +270,59 @@ def list_quiz_attempts(limit: int = 30) -> list[dict]:
             SELECT id, course, topic, correct, score, created_at
             FROM quiz_attempts
             ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+    return [_row_to_dict(row) for row in rows]
+
+
+def save_calendar_event(
+    course: str,
+    topic: str,
+    title: str,
+    event_type: str,
+    due_date: str,
+    source: str = "Personal calendar",
+) -> dict:
+    init_db()
+    event_id = uuid.uuid4().hex
+    with _connect() as connection:
+        connection.execute(
+            """
+            INSERT INTO calendar_events
+            (id, course, topic, title, event_type, due_date, source)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                event_id,
+                course.strip() or "Current course",
+                topic.strip() or "General review",
+                title.strip() or "Study event",
+                event_type.strip() or "assignment",
+                due_date.strip(),
+                source.strip() or "Personal calendar",
+            ),
+        )
+        row = connection.execute(
+            """
+            SELECT id, course, topic, title, event_type, due_date, source, created_at, updated_at
+            FROM calendar_events
+            WHERE id = ?
+            """,
+            (event_id,),
+        ).fetchone()
+    return _row_to_dict(row)
+
+
+def list_calendar_events(limit: int = 50) -> list[dict]:
+    init_db()
+    with _connect() as connection:
+        rows = connection.execute(
+            """
+            SELECT id, course, topic, title, event_type, due_date, source, created_at, updated_at
+            FROM calendar_events
+            ORDER BY due_date ASC, created_at DESC
             LIMIT ?
             """,
             (limit,),

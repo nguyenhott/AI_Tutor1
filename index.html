@@ -14,7 +14,7 @@
         <span>TutorFlow</span>
       </a>
       <nav aria-label="Main navigation">
-        <button class="nav-item active" data-view="dashboard"><span>01</span> Overview</button>
+        <button class="nav-item" data-view="course-start"><span>01</span> Course Hub</button>
         <button class="nav-item" data-view="tutor"><span>02</span> AI Tutor</button>
         <button class="nav-item" data-view="knowledge"><span>03</span> Knowledge</button>
         <button class="nav-item" data-view="assessment"><span>04</span> Practice</button>
@@ -34,25 +34,112 @@
 
     <main>
       <header class="topbar">
-        <div>
+        <a class="top-brand" href="#" aria-label="TutorFlow home">
+          <span class="brand-mark">T</span>
+          <span>TutorFlow</span>
+        </a>
+        <div class="topbar-title">
           <p class="eyebrow">PERSONAL LEARNING SPACE</p>
           <h1 id="page-title">Good afternoon, Thuan</h1>
         </div>
+        <nav class="top-nav" aria-label="Workspace navigation">
+          <button class="nav-item" data-view="course-start"><span>01</span> Course Hub</button>
+          <button class="nav-item" data-view="tutor"><span>02</span> AI Tutor</button>
+          <button class="nav-item" data-view="knowledge"><span>03</span> Knowledge</button>
+          <button class="nav-item" data-view="assessment"><span>04</span> Practice</button>
+          <button class="nav-item" data-view="plan"><span>05</span> Study Plan</button>
+        </nav>
         <div class="top-actions">
-          <button class="icon-button" id="reset-demo" title="Reset demo">Reset</button>
-          <button class="notification" aria-label="Notifications">3</button>
+          <span class="user-chip hidden" id="user-chip"></span>
+          <button class="icon-button" id="reset-demo" title="Reset workspace">Reset</button>
+          <button class="notification" id="notification-count" aria-label="Notifications">0</button>
         </div>
       </header>
 
-      <section class="view active" id="dashboard">
-        <div class="alert-card">
+      <section class="view active" id="login">
+        <div class="login-layout">
+          <article class="panel login-card">
+            <p class="eyebrow">STUDENT ACCESS</p>
+            <h2>Sign in to TutorFlow</h2>
+            <p>Use your Google account to open a personal learning workspace with course context, chat history, practice, and study planning.</p>
+            <div class="google-button-slot" id="google-button-slot"></div>
+            <button class="primary google-login-button" id="google-login" type="button">Load Google Sign-In</button>
+            <button class="secondary hidden" id="demo-login" type="button">Continue as teacher demo</button>
+            <small id="login-status">Google Sign-In requires GOOGLE_CLIENT_ID in the backend environment.</small>
+          </article>
+          <aside class="login-preview" aria-label="TutorFlow workspace preview">
+            <div class="preview-header">
+              <span class="chip">Live learning workspace</span>
+              <strong>Today</strong>
+            </div>
+            <div class="preview-score">
+              <span>Course confidence</span>
+              <strong>78%</strong>
+              <div class="progress"><span style="width:78%"></span></div>
+            </div>
+            <div class="preview-grid">
+              <div><span>Weak topic</span><strong>Pointers in C</strong></div>
+              <div><span>Next review</span><strong>35 min</strong></div>
+              <div><span>Materials</span><strong>Indexed</strong></div>
+              <div><span>Quiz mode</span><strong>Adaptive</strong></div>
+            </div>
+            <div class="preview-plan">
+              <div><span>09:00</span><strong>Review concept</strong></div>
+              <div><span>14:30</span><strong>Generate practice</strong></div>
+              <div><span>20:00</span><strong>Short-answer check</strong></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="course-start">
+        <div class="section-intro"><p class="eyebrow">COURSE HUB</p><h2>Choose a course to start tutoring</h2><p>Review your learning status, then choose a course. The app will open AI Tutor with that course context.</p></div>
+        <div class="course-hub-layout">
+          <article class="panel course-selection-panel">
+            <div class="panel-heading"><div><p class="eyebrow">ENROLLED COURSES</p><h2>Start a session</h2></div><span class="chip">Course-first flow</span></div>
+            <div class="course-picker" id="course-picker">
+              <button class="course-card-button" data-course="C Programming" data-topic="Pointers in C">
+                <strong>C Programming</strong>
+                <small>Pointers, arrays, functions, memory basics</small>
+              </button>
+              <button class="course-card-button" data-course="Electric Circuits" data-topic="Ohm's law">
+                <strong>Electric Circuits</strong>
+                <small>Ohm's law, KVL, KCL, nodal and mesh analysis</small>
+              </button>
+              <button class="course-card-button" data-course="Calculus II" data-topic="Integration by parts">
+                <strong>Calculus II</strong>
+                <small>Integration techniques and applications</small>
+              </button>
+            </div>
+          </article>
+          <article class="panel course-hub-overview">
+            <div class="panel-heading"><div><p class="eyebrow">TODAY'S OVERVIEW</p><h2>Learning status</h2></div><button class="text-button" data-view-button="plan">Plan</button></div>
+            <div class="mini-stat-grid">
+              <div class="mini-stat"><span>Average</span><strong id="hub-average">78%</strong><small id="hub-average-note">Course average</small></div>
+              <div class="mini-stat"><span>Mastered</span><strong id="hub-topics">0 / 0</strong><small id="hub-topics-note">Topics</small></div>
+              <div class="mini-stat"><span>Chats</span><strong id="hub-chats">0</strong><small id="hub-chats-note">Tutor sessions</small></div>
+              <div class="mini-stat"><span>Materials</span><strong id="hub-chunks">0</strong><small id="hub-chunks-note">Knowledge chunks</small></div>
+            </div>
+            <div class="source-card hub-alert-card">
+              <strong id="hub-alert-title">No weak topic detected yet</strong>
+              <small id="hub-alert-message">Complete a practice quiz to let the Progress Monitor suggest what to study next.</small>
+            </div>
+            <div id="hub-activity-list">
+              <div class="task"><span class="date">NOW<br><small></small></span><div><strong>Pick a course</strong><small>AI Tutor will start with the selected context.</small></div></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="dashboard">
+        <div class="alert-card" id="progress-alert">
           <div class="alert-icon">!</div>
           <div>
             <p class="eyebrow">PROGRESS MONITOR ALERT</p>
-            <h2>Integration by parts needs attention</h2>
-            <p>Your recent score dropped 18% below your Calculus II average. A focused 12-minute session can help.</p>
+            <h2 id="alert-title">No weak topic detected yet</h2>
+            <p id="alert-message">Complete a practice quiz to let the Progress Monitor Agent detect weak topics.</p>
           </div>
-          <button class="primary" data-open-tutor>Start tutoring</button>
+          <button class="primary" id="alert-action" data-open-tutor>Start tutoring</button>
         </div>
 
         <div class="stat-grid">
@@ -103,6 +190,11 @@
               <button class="secondary full" type="submit">Set topic</button>
             </form>
             <button class="text-button new-chat-button" id="new-chat" type="button">New chat</button>
+            <div class="tutor-actions">
+              <button class="secondary full" id="go-upload" type="button">Upload material</button>
+              <button class="secondary full" id="go-practice" type="button">Generate quiz</button>
+              <button class="secondary full" id="go-study-plan" type="button">View study plan</button>
+            </div>
             <h3>Chat history</h3>
             <div id="chat-sessions" class="session-list">
               <div class="source-card"><strong>No saved chats yet</strong><small>Ask a question to create a topic session.</small></div>
@@ -220,18 +312,64 @@
       </section>
 
       <section class="view" id="plan">
-        <div class="section-intro"><p class="eyebrow">CURRICULUM PLANNER AGENT</p><h2>Your prioritized week</h2><p>Generated from weak topics, deadlines, and 4.5 available study hours.</p></div>
-        <div class="week-grid">
+        <div class="section-intro"><p class="eyebrow">CURRICULUM PLANNER AGENT</p><h2>Study plan for the selected course</h2><p id="study-plan-summary">Generated from weak topics, deadlines, and 4.5 available study hours.</p></div>
+        <div class="content-grid plan-tools">
+          <article class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">PERSONAL CALENDAR</p><h2>Add exam or assignment</h2></div><span class="chip">Student schedule</span></div>
+            <form class="calendar-form" id="calendar-event-form">
+              <label>
+                Course
+                <input id="calendar-course" type="text" value="C Programming" required>
+              </label>
+              <label>
+                Topic
+                <input id="calendar-topic" type="text" value="Pointers in C" required>
+              </label>
+              <label>
+                Event
+                <input id="calendar-title" type="text" placeholder="e.g. Midterm exam or homework 2" required>
+              </label>
+              <label>
+                Type
+                <select id="calendar-type">
+                  <option value="exam">Exam</option>
+                  <option value="assignment">Assignment</option>
+                  <option value="quiz">Quiz</option>
+                  <option value="review">Review</option>
+                </select>
+              </label>
+              <label>
+                Due date
+                <input id="calendar-date" type="date" required>
+              </label>
+              <button class="secondary full" type="submit">Add to calendar</button>
+              <small id="calendar-status">Add your schedule so alerts and study plan can prioritize upcoming exams.</small>
+            </form>
+          </article>
+          <article class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">UPCOMING</p><h2>Calendar events</h2></div></div>
+            <div class="source-card google-calendar-card">
+              <strong>Google Calendar</strong>
+              <small id="google-calendar-status">Connect requires Google Cloud OAuth credentials.</small>
+              <button class="secondary full" id="connect-google-calendar" type="button">Connect Google Calendar</button>
+            </div>
+            <div id="calendar-events">
+              <div class="source-card"><strong>No personal calendar yet</strong><small>Add an exam or assignment to personalize the plan.</small></div>
+            </div>
+          </article>
+        </div>
+        <div class="week-grid" id="study-plan-grid">
           <article class="day-card priority"><p>MON - JUN 08</p><h3>Integration by parts</h3><span>35 min - Calculus II</span><div class="tag">Priority: High</div><small>Review concept -> 2 worked examples -> 5-question quiz</small></article>
           <article class="day-card"><p>TUE - JUN 09</p><h3>Binary search trees</h3><span>30 min - Data Structures</span><div class="tag">Practice</div><small>Traversal recap -> adaptive coding questions</small></article>
           <article class="day-card"><p>WED - JUN 10</p><h3>Normalization</h3><span>45 min - Databases</span><div class="tag">Exam prep</div><small>Functional dependencies -> 3NF exercises</small></article>
           <article class="day-card"><p>THU - JUN 11</p><h3>Mixed review</h3><span>25 min - Calculus II</span><div class="tag">Reinforce</div><small>Spaced review based on Monday's quiz result</small></article>
         </div>
-        <article class="panel rationale"><p class="eyebrow">WHY THIS PLAN?</p><p><strong>Calculus receives first priority</strong> because the topic score fell below 60% and an assignment is due in two days. Database review is scheduled before the midterm, while strong Data Structures performance requires only maintenance practice.</p></article>
+        <article class="panel rationale"><p class="eyebrow">WHY THIS PLAN?</p><p id="study-plan-rationale"><strong>Calculus receives first priority</strong> because the topic score fell below 60% and an assignment is due in two days. Database review is scheduled before the midterm, while strong Data Structures results require only maintenance practice.</p></article>
       </section>
     </main>
   </div>
   <div class="toast" id="toast" role="status"></div>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="app.js"></script>
 </body>
 </html>

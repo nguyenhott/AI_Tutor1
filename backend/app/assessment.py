@@ -9,6 +9,13 @@ from pydantic import BaseModel, Field
 from app.sources import Source
 
 QuizGenerator = Callable[[list[dict], float], Awaitable[str]]
+CJK_PATTERN = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
+
+LANGUAGE_RULES = (
+    "Language constraint: use Vietnamese or English only. "
+    "Never use Chinese, Japanese, Korean, Han characters, or mixed Chinese/Vietnamese text. "
+    "If the source text is English, keep technical terms in English and explain them in Vietnamese."
+)
 
 
 class PracticeRequest(BaseModel):
@@ -195,6 +202,22 @@ def _clean_list(value: object) -> list[str]:
     return [str(item).strip() for item in value if str(item).strip()]
 
 
+def _has_cjk(text: str) -> bool:
+    return bool(CJK_PATTERN.search(text or ""))
+
+
+def _language_safe_text(text: object, fallback: str) -> str:
+    value = str(text or "").strip()
+    if not value or _has_cjk(value):
+        return fallback
+    return value
+
+
+def _language_safe_list(value: object, fallback: list[str]) -> list[str]:
+    items = [item for item in _clean_list(value) if not _has_cjk(item)]
+    return items or fallback
+
+
 def _coerce_generated_question(
     raw: dict,
     request: PracticeRequest,
@@ -224,10 +247,23 @@ def _coerce_generated_question(
     question_text = str(raw.get("question") or "").strip()
     if not question_text:
         raise ValueError("Generated question is empty")
+    if _has_cjk(question_text):
+        raise ValueError("Generated question used a disallowed language")
 
     explanation = str(raw.get("explanation") or "").strip()
-    if not explanation:
-        explanation = "Review the related source material and compare your answer with the expected idea."
+    explanation = _language_safe_text(
+        explanation,
+        "Xem lại tài liệu nguồn liên quan và so sánh câu trả lời với ý chính cần nắm.",
+    )
+    choices = [choice for choice in choices if not _has_cjk(choice)]
+    correct_answer = _language_safe_text(correct_answer, "")
+    expected_keywords = _language_safe_list(expected_keywords, _keywords_from_topic(request.topic or request.prompt))
+
+    if question_type == "multiple_choice":
+        if len(choices) < 2 or not correct_answer:
+            raise ValueError("Generated multiple-choice question used a disallowed language")
+        if correct_answer not in choices:
+            choices.append(correct_answer)
 
     return PracticeQuestion(
         id=f"ai-{uuid.uuid4().hex[:10]}-{index + 1}",
@@ -356,6 +392,7 @@ async def generate_practice_with_llm(
     source_ids = _source_ids(sources)
     system_prompt = (
         "You are a strict assessment designer for an AI tutoring system. "
+        f"{LANGUAGE_RULES} "
         "Generate practice questions using ONLY the provided course sources. "
         "Respect the requested number of questions, difficulty, and question type. "
         "Every question must be answerable from the sources. "
@@ -395,7 +432,8 @@ RULES:
 - Generate exactly {request.count} questions.
 - Follow QUESTION TYPE exactly.
 - Questions must be answerable from SOURCES.
-- Use Vietnamese for question and explanation.
+- Use Vietnamese for question, feedback-oriented text, and explanation. English technical terms from SOURCES are allowed.
+- Do not use Chinese characters or Chinese sentences anywhere in the JSON.
 - For multiple_choice, correctAnswer must exactly match one item in choices.
 - For short_answer, correctAnswer must be a concise reference answer and expectedKeywords must contain 3 to 5 grading keywords.
 - Match the recommended difficulty and avoid overly broad questions.
@@ -498,6 +536,7 @@ async def evaluate_answer_with_llm(
 
     system_prompt = (
         "You are a strict but helpful Vietnamese tutor. "
+        f"{LANGUAGE_RULES} "
         "Evaluate the student's short answer using ONLY the provided source material, "
         "the question, the expected answer, and the rubric keywords. "
         "Do not use outside knowledge to rescue an answer when the provided sources are insufficient. "
@@ -536,6 +575,8 @@ RULES:
 - feedback must mention what is correct and what is missing.
 - explanation must be grounded in SOURCES and must not introduce unsupported facts.
 - hint must help the student retry without giving a long solution.
+- feedback, explanation, missingConcepts, and hint must use Vietnamese or English only.
+- Do not use Chinese characters or Chinese sentences anywhere in the JSON.
 - If SOURCES are insufficient, set correct to false, score at most 0.3, and explain that the uploaded material is insufficient.
 """
     raw_answer = await evaluator(
@@ -555,10 +596,22 @@ RULES:
         status="ok",
         correct=correct,
         score=round(score, 2),
-        feedback=str(parsed.get("feedback") or "Answer evaluated."),
-        explanation=str(parsed.get("explanation") or question.explanation),
+        feedback=_language_safe_text(
+            parsed.get("feedback"),
+            "Câu trả lời cần xem lại. Hãy so sánh với đáp án tham khảo và bổ sung các ý còn thiếu.",
+        ),
+        explanation=_language_safe_text(
+            parsed.get("explanation"),
+            _language_safe_text(
+                question.explanation,
+                "Câu trả lời cần bám vào ý chính trong đáp án tham khảo và tài liệu nguồn.",
+            ),
+        ),
         correctAnswer=question.correctAnswer,
-        hint=str(parsed.get("hint") or ""),
-        missingConcepts=_clean_list(parsed.get("missingConcepts")),
+        hint=_language_safe_text(
+            parsed.get("hint"),
+            "Đọc lại phần đáp án tham khảo, sau đó trả lời bằng các ý chính trong tài liệu.",
+        ),
+        missingConcepts=_language_safe_list(parsed.get("missingConcepts"), question.expectedKeywords[:3]),
         newMastery=_mastery_after_score(request.currentMastery, score),
     )

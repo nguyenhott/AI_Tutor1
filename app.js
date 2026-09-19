@@ -3,7 +3,10 @@ const navItems = [...document.querySelectorAll(".nav-item")];
 const title = document.querySelector("#page-title");
 const toast = document.querySelector("#toast");
 let currentModelLabel = "selected model";
-const API_BASE = "http://127.0.0.1:8000";
+const LOCAL_BACKEND = "http://127.0.0.1:8000";
+const API_BASE = ["localhost", "127.0.0.1"].includes(window.location.hostname) && window.location.port !== "8000"
+  ? LOCAL_BACKEND
+  : window.location.origin;
 let availableDocuments = [];
 let currentPracticeTopic = "Pointers in C";
 let currentPracticeCourse = "C Programming";
@@ -11,6 +14,10 @@ let currentPracticePrompt = "Pointers in C";
 let currentPracticeDocumentId = "";
 let currentMastery = 46;
 let currentSessionId = null;
+let latestProgressReport = null;
+let latestStudyPlan = null;
+let currentUser = null;
+let googleSignInReady = false;
 
 async function fetchJson(path) {
   const response = await fetch(`${API_BASE}${path}`);
@@ -31,6 +38,121 @@ function escapeHtml(value) {
 function setText(selector, value) {
   const element = document.querySelector(selector);
   if (element) element.textContent = value;
+}
+
+function decodeGoogleCredential(credential) {
+  const payload = credential?.split(".")?.[1];
+  if (!payload) throw new Error("Google credential is missing a profile payload");
+  const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+  const json = decodeURIComponent(
+    atob(normalized)
+      .split("")
+      .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, "0")}`)
+      .join("")
+  );
+  return JSON.parse(json);
+}
+
+function completeGoogleLogin(profile) {
+  currentUser = {
+    name: profile?.name || profile?.email || "Student",
+    email: profile?.email || ""
+  };
+  document.body.classList.add("is-authenticated");
+  const userChip = document.querySelector("#user-chip");
+  if (userChip) {
+    userChip.textContent = currentUser.name;
+    userChip.title = currentUser.email || currentUser.name;
+    userChip.classList.remove("hidden");
+  }
+  notify(`Signed in as ${currentUser.name}`);
+  showView("course-start");
+  refreshDashboard();
+}
+
+function revealDemoLogin(message = "Teacher demo login is available for this cloud session.") {
+  const demoButton = document.querySelector("#demo-login");
+  const status = document.querySelector("#login-status");
+  if (demoButton) demoButton.classList.remove("hidden");
+  if (status) status.textContent = message;
+}
+
+function completeDemoLogin() {
+  completeGoogleLogin({ name: "Teacher demo", email: "cloud-demo@tutorflow.local" });
+}
+
+function handleGoogleCredential(response) {
+  try {
+    const profile = decodeGoogleCredential(response?.credential);
+    completeGoogleLogin(profile);
+  } catch (error) {
+    const status = document.querySelector("#login-status");
+    if (status) status.textContent = `Google Sign-In failed: ${error.message}`;
+  }
+}
+
+function waitForGoogleIdentityScript(timeoutMs = 4000) {
+  const started = Date.now();
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      if (window.google?.accounts?.id) {
+        resolve();
+        return;
+      }
+      if (Date.now() - started >= timeoutMs) {
+        reject(new Error("Google Sign-In script did not finish loading"));
+        return;
+      }
+      setTimeout(check, 120);
+    };
+    check();
+  });
+}
+
+async function setupGoogleSignInButton() {
+  if (googleSignInReady) return true;
+  const status = document.querySelector("#login-status");
+  const slot = document.querySelector("#google-button-slot");
+  const fallbackButton = document.querySelector("#google-login");
+
+  try {
+    const data = await fetchJson("/api/auth/google/login");
+    if (data.demoLogin) {
+      revealDemoLogin(data.configured
+        ? "Use Google Sign-In, or continue with teacher demo for this cloud session."
+        : "Google Sign-In is not configured for this public URL. Use teacher demo for Colab.");
+    }
+    if (!data.configured || !data.clientId) {
+      if (status) status.textContent = data.message || "Google Sign-In is not configured yet.";
+      if (data.demoLogin) {
+        revealDemoLogin("Google Sign-In is not configured for this public URL. Use teacher demo for Colab.");
+      }
+      return false;
+    }
+
+    await waitForGoogleIdentityScript();
+    window.google.accounts.id.initialize({
+      client_id: data.clientId,
+      callback: handleGoogleCredential
+    });
+    if (slot) {
+      slot.innerHTML = "";
+      window.google.accounts.id.renderButton(slot, {
+        theme: "outline",
+        size: "large",
+        text: "signin_with",
+        shape: "rectangular",
+        width: Math.min(420, slot.clientWidth || 420)
+      });
+    }
+    fallbackButton?.classList.add("hidden");
+    if (status) status.textContent = "Choose your Google account to continue.";
+    googleSignInReady = true;
+    return true;
+  } catch (error) {
+    if (status) status.textContent = `Google Sign-In unavailable: ${error.message}`;
+    return false;
+  }
 }
 
 function inferCourseFromDocument(doc) {
@@ -71,9 +193,68 @@ function formatDateBadge(value) {
   return `${day}<br><small>${month}</small>`;
 }
 
+function formatShortDate(value) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 function percentFromScore(score) {
   const numeric = Number(score || 0);
   return Math.round(numeric <= 1 ? numeric * 100 : numeric);
+}
+
+function renderProgressAlert(report) {
+  const alert = report?.alerts?.[0];
+  const titleElement = document.querySelector("#alert-title");
+  const messageElement = document.querySelector("#alert-message");
+  const actionElement = document.querySelector("#alert-action");
+  const notificationElement = document.querySelector("#notification-count");
+  if (!titleElement || !messageElement || !actionElement) return;
+
+  if (!alert) {
+    titleElement.textContent = "No weak topic detected yet";
+    messageElement.textContent = "Complete a practice quiz to let the Progress Monitor Agent detect weak topics.";
+    actionElement.textContent = "Start tutoring";
+    if (notificationElement) notificationElement.textContent = "0";
+    return;
+  }
+
+  titleElement.textContent = `${alert.topic} needs attention`;
+  messageElement.textContent = alert.message;
+  actionElement.textContent = "Review this topic";
+  if (notificationElement) notificationElement.textContent = report.summary?.alerts ?? report.alerts.length;
+}
+
+function renderCourseProgressFromReport(report) {
+  const box = document.querySelector("#course-progress");
+  const topics = report?.topics || [];
+  if (!box || !topics.length) return false;
+
+  const byCourse = new Map();
+  topics.forEach((topic) => {
+    const course = topic.course || "Current course";
+    const summary = byCourse.get(course) || { course, mastery: [], topics: 0, mastered: 0, weak: [] };
+    summary.mastery.push(Number(topic.mastery || 0));
+    summary.topics += 1;
+    if (Number(topic.mastery || 0) >= 80) summary.mastered += 1;
+    if (Number(topic.mastery || 0) < 70) summary.weak.push(topic.topic);
+    byCourse.set(course, summary);
+  });
+
+  box.innerHTML = [...byCourse.values()].map((course) => {
+    const average = Math.round(course.mastery.reduce((sum, score) => sum + score, 0) / course.mastery.length);
+    const warning = average < 70;
+    const weakLabel = course.weak.length ? `Weak: ${course.weak.slice(0, 2).join(", ")}` : `${course.mastered} of ${course.topics} topics mastered`;
+    return `
+      <div class="course-row">
+        <div><strong>${escapeHtml(course.course)}</strong><small>${escapeHtml(weakLabel)}</small></div>
+        <div class="course-score ${warning ? "warning" : ""}">${average}%</div>
+        <div class="progress ${warning ? "warning-bar" : ""}"><span style="width:${average}%"></span></div>
+      </div>
+    `;
+  }).join("");
+  return true;
 }
 
 function renderCourseProgress(attempts) {
@@ -105,11 +286,16 @@ function renderCourseProgress(attempts) {
   }).join("");
 }
 
-function renderActivityList(attempts, sessions, documents) {
+function renderActivityList(attempts, sessions, documents, deadlines = []) {
   const box = document.querySelector("#activity-list");
   if (!box) return;
 
   const items = [
+    ...deadlines.slice(0, 3).map((deadline) => ({
+      date: deadline.dueDate,
+      title: deadline.title,
+      detail: `${deadline.course} - ${deadline.type} from ${deadline.source}`
+    })),
     ...attempts.slice(0, 3).map((attempt) => ({
       date: attempt.created_at,
       title: `${attempt.correct ? "Passed" : "Reviewed"} ${attempt.topic}`,
@@ -140,27 +326,166 @@ function renderActivityList(attempts, sessions, documents) {
   `).join("");
 }
 
+function renderHubOverview({ progressData, attempts, sessions, documents, rag, deadlines }) {
+  const summary = progressData?.summary;
+  if (summary) {
+    setText("#hub-average", `${summary.averageMastery}%`);
+    setText("#hub-average-note", `${summary.weakTopics} weak topics`);
+    setText("#hub-topics", `${summary.topicsMastered} / ${summary.topicsTracked}`);
+    setText("#hub-topics-note", "Topics mastered");
+  } else if (attempts.length) {
+    const scores = attempts.map((attempt) => percentFromScore(attempt.score));
+    const average = Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+    setText("#hub-average", `${average}%`);
+    setText("#hub-average-note", `${attempts.length} graded attempts`);
+  }
+
+  setText("#hub-chats", sessions.length);
+  setText("#hub-chats-note", sessions.length === 1 ? "Tutor session" : "Tutor sessions");
+  setText("#hub-chunks", rag.indexedChunks || 0);
+  setText("#hub-chunks-note", documents.length ? `${documents.length} materials` : "Knowledge chunks");
+
+  const alert = progressData?.alerts?.[0];
+  setText("#hub-alert-title", alert ? `${alert.topic} needs attention` : "No weak topic detected yet");
+  setText(
+    "#hub-alert-message",
+    alert ? alert.message : "Complete a practice quiz to let the Progress Monitor suggest what to study next."
+  );
+
+  const box = document.querySelector("#hub-activity-list");
+  if (!box) return;
+  const items = [
+    ...(deadlines || []).slice(0, 2).map((deadline) => ({
+      date: deadline.dueDate,
+      title: deadline.title,
+      detail: `${deadline.course} - ${deadline.type}`
+    })),
+    ...attempts.slice(0, 2).map((attempt) => ({
+      date: attempt.created_at,
+      title: `${attempt.correct ? "Passed" : "Reviewed"} ${attempt.topic}`,
+      detail: `${attempt.course} - ${percentFromScore(attempt.score)}%`
+    })),
+    ...sessions.slice(0, 1).map((session) => ({
+      date: session.updated_at,
+      title: session.topic,
+      detail: `${session.course} - recent tutor chat`
+    }))
+  ].filter((item) => item.title).slice(0, 4);
+
+  box.innerHTML = items.length ? items.map((item) => `
+    <div class="task">
+      <span class="date">${formatDateBadge(item.date)}</span>
+      <div><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail)}</small></div>
+    </div>
+  `).join("") : `<div class="task"><span class="date">NOW<br><small></small></span><div><strong>Pick a course</strong><small>AI Tutor will start with the selected context.</small></div></div>`;
+}
+
+function renderStudyPlan(plan) {
+  const grid = document.querySelector("#study-plan-grid");
+  const summary = document.querySelector("#study-plan-summary");
+  const rationale = document.querySelector("#study-plan-rationale");
+  if (!grid || !plan?.items?.length) return;
+
+  if (summary) {
+    summary.textContent = `Generated from weak topics, ${plan.deadlines?.length || 0} calendar/deadline items, and ${Math.round((plan.availableMinutes || 0) / 60)} available study hours.`;
+  }
+  if (rationale) {
+    rationale.textContent = plan.rationale || "The plan prioritizes weak topics first, then upcoming deadlines.";
+  }
+
+  const days = ["MON", "TUE", "WED", "THU", "FRI"];
+  const byDay = new Map(days.map((day) => [day, []]));
+  plan.items.slice(0, 8).forEach((item, index) => {
+    const day = item.day || days[index % days.length];
+    if (!byDay.has(day)) byDay.set(day, []);
+    byDay.get(day).push(item);
+  });
+
+  grid.classList.add("calendar-board");
+  grid.innerHTML = [...byDay.entries()].map(([day, items]) => `
+    <article class="calendar-day">
+      <header><strong>${escapeHtml(day)}</strong><small>${escapeHtml(formatShortDate(items[0]?.date) || "This week")}</small></header>
+      ${items.length ? items.map((item) => {
+        const priority = item.priority === "High";
+        const deadline = item.deadline ? `${item.deadline.title} due ${item.deadline.dueDate}` : item.reason;
+        return `
+          <div class="calendar-event ${priority ? "priority" : ""}">
+            <strong>${escapeHtml(item.topic)}</strong>
+            <small>${Number(item.minutes || 25)} min - ${escapeHtml(item.course)}</small>
+            <small>${escapeHtml(item.activity)}. ${escapeHtml(deadline || "")}</small>
+          </div>
+        `;
+      }).join("") : `<div class="calendar-event"><strong>Open review slot</strong><small>No priority item scheduled.</small></div>`}
+    </article>
+  `).join("");
+}
+
+function renderCalendarEvents(events = []) {
+  const box = document.querySelector("#calendar-events");
+  if (!box) return;
+
+  const personalEvents = events.filter((event) => event.source === "Personal calendar");
+  const shownEvents = (personalEvents.length ? personalEvents : events).slice(0, 6);
+  if (!shownEvents.length) {
+    box.innerHTML = `<div class="source-card"><strong>No personal calendar yet</strong><small>Add an exam or assignment to personalize the plan.</small></div>`;
+    return;
+  }
+
+  box.innerHTML = shownEvents.map((event) => `
+    <div class="source-card">
+      <strong>${escapeHtml(event.title)}</strong>
+      <small>${escapeHtml(event.course)} - ${escapeHtml(event.topic)} - ${escapeHtml(event.type)} due ${escapeHtml(event.dueDate)}</small>
+      <small>${escapeHtml(event.source)}</small>
+    </div>
+  `).join("");
+}
+
 async function refreshDashboard() {
-  const [documentsResult, sessionsResult, attemptsResult] = await Promise.allSettled([
+  const [documentsResult, sessionsResult, attemptsResult, progressResult, planResult] = await Promise.allSettled([
     fetchJson("/api/documents"),
     fetchJson("/api/chat/sessions"),
-    fetchJson("/api/practice/attempts")
+    fetchJson("/api/practice/attempts"),
+    fetchJson("/api/progress/monitor"),
+    fetchJson("/api/study-plan")
   ]);
 
   const documentsData = documentsResult.status === "fulfilled" ? documentsResult.value : {};
   const sessionsData = sessionsResult.status === "fulfilled" ? sessionsResult.value : {};
   const attemptsData = attemptsResult.status === "fulfilled" ? attemptsResult.value : {};
+  const progressData = progressResult.status === "fulfilled" ? progressResult.value : null;
+  const planData = planResult.status === "fulfilled" ? planResult.value : null;
   const documents = documentsData.documents || [];
   const sessions = sessionsData.sessions || [];
   const attempts = attemptsData.attempts || [];
   const rag = documentsData.rag || {};
+  latestProgressReport = progressData;
+  latestStudyPlan = planData;
 
   setText("#stat-chats", sessions.length);
   setText("#stat-chats-note", sessions.length === 1 ? "Tutor session" : "Tutor sessions");
   setText("#stat-chunks", rag.indexedChunks || 0);
   setText("#stat-chunks-note", documents.length ? `${documents.length} materials indexed` : "Course materials");
+  renderProgressAlert(progressData);
+  if (planData) renderStudyPlan(planData);
+  renderCalendarEvents(planData?.deadlines || progressData?.deadlines || []);
+  renderHubOverview({
+    progressData,
+    attempts,
+    sessions,
+    documents,
+    rag,
+    deadlines: progressData?.deadlines || planData?.deadlines || []
+  });
 
-  if (attempts.length) {
+  if (progressData?.summary) {
+    setText("#stat-average", `${progressData.summary.averageMastery}%`);
+    setText("#stat-average-note", `${progressData.summary.weakTopics} weak topics`);
+    setText("#stat-topics", `${progressData.summary.topicsMastered} / ${progressData.summary.topicsTracked}`);
+    setText("#stat-topics-note", `${Math.max(0, progressData.summary.topicsTracked - progressData.summary.topicsMastered)} in progress`);
+    renderCourseProgressFromReport(progressData);
+  }
+
+  if (!progressData?.summary && attempts.length) {
     const scores = attempts.map((attempt) => percentFromScore(attempt.score));
     const average = Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
     const topics = new Set(attempts.map((attempt) => `${attempt.course}:${attempt.topic}`));
@@ -177,7 +502,7 @@ async function refreshDashboard() {
     renderCourseProgress(attempts);
   }
 
-  renderActivityList(attempts, sessions, documents);
+  renderActivityList(attempts, sessions, documents, progressData?.deadlines || planData?.deadlines || []);
 }
 function formatDocument(doc) {
   const pages = doc.pageCount ? `${doc.pageCount} pages` : "No pages";
@@ -198,7 +523,7 @@ async function deleteDocument(documentId, title) {
   if (!confirm(`Delete "${title}" from the knowledge base?`)) return;
 
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/documents/${encodeURIComponent(documentId)}`, {
+    const response = await fetch(`${API_BASE}/api/documents/${encodeURIComponent(documentId)}`, {
       method: "DELETE"
     });
     const data = await response.json();
@@ -252,7 +577,7 @@ async function refreshRagStatus() {
   if (!statusCard || !documentsBox) return;
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/documents");
+    const response = await fetch(`${API_BASE}/api/documents`);
     if (!response.ok) throw new Error(`Backend returned ${response.status}`);
     const data = await response.json();
     const rag = data.rag || {};
@@ -294,9 +619,13 @@ function updateLearningContext({ course, topic, prompt, sessionId, documentId } 
   const practiceCourse = document.querySelector("#practice-course");
   const practiceTopic = document.querySelector("#practice-topic");
   const practiceDocument = document.querySelector("#practice-document");
+  const calendarCourse = document.querySelector("#calendar-course");
+  const calendarTopic = document.querySelector("#calendar-topic");
   if (practiceCourse) practiceCourse.value = currentPracticeCourse;
   if (practiceTopic) practiceTopic.value = currentPracticeTopic;
   if (practiceDocument) practiceDocument.value = currentPracticeDocumentId;
+  if (calendarCourse) calendarCourse.value = currentPracticeCourse;
+  if (calendarTopic) calendarTopic.value = currentPracticeTopic;
 }
 
 function guessTopic(text) {
@@ -327,6 +656,8 @@ function guessCourse(topic) {
 }
 
 const titles = {
+  login: "Sign in to TutorFlow",
+  "course-start": "Course hub",
   dashboard: "Good afternoon, Thuan",
   tutor: "Learn with your AI tutor",
   knowledge: "Manage course knowledge",
@@ -339,13 +670,54 @@ updateLearningContext();
 function showView(id) {
   views.forEach((view) => view.classList.toggle("active", view.id === id));
   navItems.forEach((item) => item.classList.toggle("active", item.dataset.view === id));
-  title.textContent = titles[id];
+  title.textContent = titles[id] || titles.dashboard;
 }
 
+showView("login");
 navItems.forEach((item) => item.addEventListener("click", () => showView(item.dataset.view)));
-document.querySelector("[data-open-tutor]").addEventListener("click", () => showView("tutor"));
+setupGoogleSignInButton();
+document.querySelector("#google-login")?.addEventListener("click", async () => {
+  const status = document.querySelector("#login-status");
+  if (status) status.textContent = "Loading Google Sign-In button...";
+  const ready = await setupGoogleSignInButton();
+  if (!ready) notify("Google Sign-In config required");
+});
+document.querySelector("#demo-login")?.addEventListener("click", completeDemoLogin);
+document.querySelectorAll(".course-card-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    updateLearningContext({
+      course: button.dataset.course,
+      topic: button.dataset.topic,
+      prompt: button.dataset.topic,
+      sessionId: null
+    });
+    clearMessages();
+    addMessage(`Course set to ${currentPracticeCourse}. Current focus: ${currentPracticeTopic}.`, "tutor", "Course context");
+    notify(`Course selected: ${currentPracticeCourse}`);
+    showView("tutor");
+    refreshDashboard();
+  });
+});
+document.querySelector("[data-open-tutor]").addEventListener("click", () => {
+  const alert = latestProgressReport?.alerts?.[0];
+  if (alert) {
+    updateLearningContext({
+      course: alert.course,
+      topic: alert.topic,
+      prompt: alert.topic,
+      sessionId: null
+    });
+  }
+  showView("tutor");
+});
 document.querySelector("[data-view-button]").addEventListener("click", () => showView("plan"));
 document.querySelector("#quiz-from-chat").addEventListener("click", async () => { showView("assessment"); await loadPracticeQuestions(); });
+document.querySelector("#go-upload")?.addEventListener("click", () => showView("knowledge"));
+document.querySelector("#go-practice")?.addEventListener("click", async () => {
+  showView("assessment");
+  renderPracticeIdle();
+});
+document.querySelector("#go-study-plan")?.addEventListener("click", () => showView("plan"));
 document.querySelector("#generate-practice").addEventListener("click", loadPracticeQuestions);
 document.querySelector("#practice-document").addEventListener("change", (event) => {
   const documentId = event.target.value;
@@ -363,6 +735,61 @@ document.querySelector("#practice-course").addEventListener("input", (event) => 
 });
 document.querySelector("#practice-topic").addEventListener("input", (event) => {
   updateLearningContext({ topic: event.target.value, prompt: event.target.value });
+});
+const calendarForm = document.querySelector("#calendar-event-form");
+if (calendarForm) {
+  calendarForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const status = document.querySelector("#calendar-status");
+    const payload = {
+      course: document.querySelector("#calendar-course")?.value || currentPracticeCourse,
+      topic: document.querySelector("#calendar-topic")?.value || currentPracticeTopic,
+      title: document.querySelector("#calendar-title")?.value || "Study event",
+      type: document.querySelector("#calendar-type")?.value || "assignment",
+      dueDate: document.querySelector("#calendar-date")?.value || "",
+      source: "Personal calendar"
+    };
+
+    if (!payload.dueDate) {
+      notify("Choose a due date first");
+      return;
+    }
+
+    if (status) status.textContent = "Saving calendar event...";
+    try {
+      const response = await fetch(`${API_BASE}/api/calendar/events`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || `Backend returned ${response.status}`);
+
+      if (status) status.textContent = "Calendar saved. Alerts and study plan updated.";
+      document.querySelector("#calendar-title").value = "";
+      await refreshDashboard();
+      notify("Personal calendar updated");
+    } catch (error) {
+      if (status) status.textContent = `Calendar save failed: ${error.message}`;
+      notify("Could not save calendar event");
+    }
+  });
+}
+document.querySelector("#connect-google-calendar")?.addEventListener("click", async () => {
+  const status = document.querySelector("#google-calendar-status");
+  try {
+    const info = await fetchJson("/api/google/calendar/status");
+    const auth = await fetchJson("/api/auth/google/login");
+    if (auth.configured && auth.authUrl) {
+      window.location.href = auth.authUrl;
+      return;
+    }
+    if (status) status.textContent = info.message || auth.message || "Google Calendar OAuth credentials are not configured.";
+    notify("Google Calendar needs OAuth credentials");
+  } catch (error) {
+    if (status) status.textContent = `Google Calendar unavailable: ${error.message}`;
+    notify("Google Calendar connection failed");
+  }
 });
 document.querySelector("#topic-form").addEventListener("submit", (event) => {
   event.preventDefault();
@@ -421,7 +848,7 @@ async function askBackendTutor(input, onToken) {
   const timeoutId = setTimeout(() => controller.abort(), 25000);
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/chat", {
+    const response = await fetch(`${API_BASE}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal: controller.signal,
@@ -489,7 +916,7 @@ async function loadChatSessions() {
   if (!box) return;
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/chat/sessions");
+    const response = await fetch(`${API_BASE}/api/chat/sessions`);
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || `Backend returned ${response.status}`);
 
@@ -512,7 +939,7 @@ async function loadChatSessions() {
 
 async function loadChatSession(sessionId) {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/chat/sessions/${encodeURIComponent(sessionId)}/messages`);
+    const response = await fetch(`${API_BASE}/api/chat/sessions/${encodeURIComponent(sessionId)}/messages`);
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || `Backend returned ${response.status}`);
 
@@ -587,7 +1014,7 @@ if (uploadForm) {
 
     uploadStatus.textContent = "Uploading, chunking, and embedding document...";
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/documents/upload", {
+      const response = await fetch(`${API_BASE}/api/documents/upload`, {
         method: "POST",
         body: formData
       });
@@ -696,7 +1123,7 @@ async function loadPracticeQuestions() {
   document.querySelector("#answers").innerHTML = "";
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/practice/recommend", {
+    const response = await fetch(`${API_BASE}/api/practice/recommend`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -773,7 +1200,7 @@ async function submitPracticeAnswer(answer, selectedButton) {
   allButtons.forEach((item) => item.disabled = true);
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/practice/submit", {
+    const response = await fetch(`${API_BASE}/api/practice/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

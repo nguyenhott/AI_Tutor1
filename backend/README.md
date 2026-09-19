@@ -13,6 +13,10 @@ Backend dùng FastAPI để cung cấp các chức năng chính cho Personal AI 
 - Lưu chat history, quiz attempts, và topic mastery bằng SQLite.
 - Sinh adaptive practice theo tài liệu đã chọn, topic, độ khó, số câu, và loại câu.
 - Chấm multiple choice và short answer dựa trên tài liệu upload/RAG.
+- Theo dõi tiến độ học bằng Progress Monitor Agent dựa trên quiz history/topic mastery.
+- Tạo in-app weak-topic alerts và Study Plan động từ weak topics + mock LMS/calendar deadlines.
+- Lưu lịch cá nhân của học sinh gồm exam/quiz/assignment/review để ưu tiên ôn tập môn sắp thi.
+- Thêm login/course start flow, giao diện Study Plan dạng calendar, và Google Calendar OAuth-ready placeholder.
 
 ## 1. Models Cần Pull
 
@@ -62,6 +66,14 @@ OLLAMA_NUM_CTX=2048
 OLLAMA_EMBED_BATCH_SIZE=16
 CHROMA_DB_DIR=./data/chroma
 CHROMA_COLLECTION=course_materials
+GOOGLE_CLIENT_ID=
+GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/api/auth/google/callback
+```
+
+Với Google Sign-In ở frontend, tạo OAuth Client loại **Web application** trong Google Cloud và thêm JavaScript origin:
+
+```text
+http://localhost:3000
 ```
 
 Có thể đổi chat model:
@@ -76,7 +88,6 @@ $env:OLLAMA_MODEL="gemma2:2b"
 cd D:\Project\Personal_AI_Tutoring_Tool\demo\backend
 .\.venv\Scripts\python -m uvicorn app.main:app --reload --port 8000
 ```
-
 Restart backend khi sửa code Python hoặc backend bị lỗi:
 
 ```powershell
@@ -105,6 +116,22 @@ Nếu Chroma đang có vector, status sẽ có:
 ```json
 "retrievalMode": "chroma"
 ```
+
+## 4.1. Demo Trên Google Colab
+
+Để cô có thể vào test qua public URL tạm thời, dùng notebook:
+
+```text
+colab/host_tutorflow_colab.ipynb
+```
+
+Hướng dẫn chi tiết:
+
+```text
+docs/google_colab_hosting_vi.md
+```
+
+Notebook sẽ chạy FastAPI, serve luôn frontend, bật teacher demo login cho Colab, tạo public URL bằng Cloudflare Tunnel, và có cell đổi model để test Qwen/Gemma/Phi/Llama.
 
 ## 5. Chạy Frontend Và Upload Tài Liệu
 
@@ -300,6 +327,22 @@ User submits quiz answer
 -> multiple_choice is graded by correctAnswer
 -> short_answer is evaluated by LLM with source-grounded rubric
 -> storage.py saves quiz attempt and updates topic mastery
+
+Dashboard progress monitoring
+-> GET /api/progress/monitor
+-> progress.py reads quiz_attempts/topic_mastery
+-> weak topics are detected below the mastery threshold
+-> frontend shows in-app alert and recommended tutoring action
+
+Dynamic study planning
+-> GET /api/study-plan
+-> progress.py combines weak topics with personal calendar + mock LMS/calendar deadlines
+-> frontend renders the prioritized weekly plan
+
+Personal calendar
+-> POST /api/calendar/events
+-> storage.py saves exam/quiz/assignment/review dates into SQLite
+-> Progress Monitor uses upcoming exams/deadlines when creating alerts
 ```
 
 ## 11. Files Quan Trọng
@@ -312,6 +355,7 @@ backend/app/main.py                # upload/chat/status APIs
 backend/app/ollama_client.py       # chat model and embedding model calls
 backend/app/assessment.py          # practice generation and answer evaluation
 backend/app/storage.py             # SQLite chat/quiz/mastery persistence
+backend/app/progress.py            # progress monitor, weak-topic alerts, dynamic study plan
 backend/scripts/build_calculus_index.py # CLI index builder
 backend/data/chroma/               # Chroma persistent vector database
 backend/data/rag_index.json        # readable backup index
@@ -406,21 +450,108 @@ APIs:
 GET /api/chat/sessions
 GET /api/chat/sessions/{session_id}/messages
 GET /api/practice/attempts
+GET /api/progress/monitor
+GET /api/study-plan
+GET /api/integrations/mock-deadlines
+GET /api/calendar/events
+POST /api/calendar/events
+GET /api/auth/google/login
+GET /api/google/calendar/status
 ```
 
-## 14. Current Demo Scope And Future Work
+## 14. Progress Monitor / Planner / Mock Integration
+
+Progress Monitor Agent hiện đọc dữ liệu từ SQLite:
+
+```text
+quiz_attempts + topic_mastery
+-> aggregate per course/topic
+-> detect weak topics when mastery < 70 or recent trend drops
+-> return weakTopics, alerts, summary, deadlines
+```
+
+Endpoint:
+
+```text
+GET /api/progress/monitor
+```
+
+Study Planner hiện tạo kế hoạch học động:
+
+```text
+weak topics + mock LMS/calendar deadlines
+-> prioritize lowest mastery first
+-> add upcoming assignments/quizzes
+-> render weekly plan in frontend Study Plan tab
+```
+
+Endpoint:
+
+```text
+GET /api/study-plan
+```
+
+Personal calendar event dùng cho demo:
+
+```text
+POST /api/calendar/events
+```
+
+Ví dụ:
+
+```json
+{
+  "course": "Electric Circuits",
+  "topic": "Ohm's law",
+  "title": "Midterm exam",
+  "type": "exam",
+  "dueDate": "2026-09-03",
+  "source": "Personal calendar"
+}
+```
+
+Mock LMS/calendar deadlines dùng cho demo:
+
+```text
+GET /api/integrations/mock-deadlines
+```
+
+Trong bản demo, học sinh có thể nhập lịch cá nhân trực tiếp từ Study Plan tab. Phần LMS/calendar vẫn có mock data để chứng minh workflow.
+
+Google Sign-In dùng Google Identity Services ở frontend. Backend cung cấp `GOOGLE_CLIENT_ID` cho trang login qua endpoint:
+
+```text
+GET /api/auth/google/login
+```
+
+Google Calendar integration hiện ở trạng thái OAuth-ready placeholder:
+
+```text
+GET /api/google/calendar/status
+```
+
+Nếu muốn bật Google Calendar thật, enable Google Calendar API, rồi set:
+
+```text
+GOOGLE_CLIENT_ID=<your-client-id>
+GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/api/auth/google/callback
+```
+
+Sau đó có thể thay API nhập tay/mock deadlines bằng dữ liệu events lấy từ Google Calendar API.
+
+## 15. Current Demo Scope And Future Work
 
 Đã làm trong demo:
 
 ```text
 Upload material -> RAG/Chroma -> Tutor Chat -> Practice Generation -> Answer Evaluation -> SQLite History
+Quiz History -> Progress Monitor -> Weak-topic Alert -> Dynamic Study Plan
+Personal Calendar -> Upcoming Exam Alert -> Review Plan
 ```
 
 Chưa làm đầy đủ so với bản mô tả production:
 
 ```text
-Progress Monitor Agent thật
-Dynamic Study Planner thật
 LMS integration OAuth
 Calendar integration
 Email/push notification
@@ -431,8 +562,8 @@ Production encryption/scaling/uptime guarantees
 Hướng tiếp theo hợp lý:
 
 ```text
-1. Tạo Progress Monitor đọc quiz_attempts/topic_mastery để phát hiện weak topics.
-2. Tạo Study Plan động từ weak topics + deadline mock data.
-3. Nối dashboard với weak-topic alert thật.
+1. Tạo AI generate course/topic list từ uploaded documents.
+2. Chuyển Topic input thành dropdown theo tài liệu đã chọn.
+3. Thêm email/push/voice notification nếu cần demo proactive alert nâng cao.
 4. Cập nhật report/slides theo architecture hiện tại.
 ```
