@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 import httpx
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 from pydantic import BaseModel, Field
@@ -122,6 +122,7 @@ class GoogleAuthResponse(BaseModel):
     configured: bool
     clientId: str = ""
     authUrl: str = ""
+    redirectUri: str = ""
     demoLogin: bool = False
     message: str = ""
 
@@ -203,11 +204,24 @@ async def _save_upload(file: UploadFile) -> Path:
     return destination
 
 
-def _google_auth_url() -> str:
+def _public_base_url(request: Request) -> str:
+    proto = (request.headers.get("x-forwarded-proto") or request.url.scheme or "http").split(",")[0].strip()
+    host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or "").split(",")[0].strip()
+    if host:
+        return f"{proto}://{host}".rstrip("/")
+    return str(request.base_url).rstrip("/")
+
+
+def _google_redirect_uri(request: Request) -> str:
+    # Use the current public URL so temporary Colab/Cloudflare domains do not require editing .env.
+    return f"{_public_base_url(request)}/api/auth/google/callback"
+
+
+def _google_auth_url(request: Request) -> tuple[str, str]:
     client_id = os.getenv("GOOGLE_CLIENT_ID", "").strip()
-    redirect_uri = os.getenv("GOOGLE_REDIRECT_URI", "http://127.0.0.1:8000/api/auth/google/callback").strip()
+    redirect_uri = _google_redirect_uri(request)
     if not client_id:
-        return ""
+        return "", redirect_uri
     params = {
         "client_id": client_id,
         "redirect_uri": redirect_uri,
@@ -216,7 +230,7 @@ def _google_auth_url() -> str:
         "access_type": "offline",
         "prompt": "consent",
     }
-    return f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
+    return f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}", redirect_uri
 
 
 def _load_google_token() -> dict | None:
@@ -237,7 +251,6 @@ def _google_configured_for_calendar() -> bool:
     return bool(
         os.getenv("GOOGLE_CLIENT_ID", "").strip()
         and os.getenv("GOOGLE_CLIENT_SECRET", "").strip()
-        and os.getenv("GOOGLE_REDIRECT_URI", "").strip()
     )
 
 
@@ -320,33 +333,44 @@ async def add_course(request: CourseCreateRequest) -> dict:
 
 
 @app.get("/api/auth/google/login", response_model=GoogleAuthResponse)
-async def google_login() -> GoogleAuthResponse:
+async def google_login(request: Request) -> GoogleAuthResponse:
     client_id = os.getenv("GOOGLE_CLIENT_ID", "").strip()
     demo_login = os.getenv("ENABLE_DEMO_LOGIN", "").strip().lower() in {"1", "true", "yes", "on"}
-    auth_url = _google_auth_url()
+    auth_url, redirect_uri = _google_auth_url(request)
     if not auth_url:
         return GoogleAuthResponse(
             status="config_required",
             configured=False,
+            redirectUri=redirect_uri,
             demoLogin=demo_login,
             message=(
                 "Google OAuth is not configured. Use teacher demo login for Colab, or set "
-                "GOOGLE_CLIENT_ID and GOOGLE_REDIRECT_URI after creating OAuth credentials in Google Cloud."
+                "GOOGLE_CLIENT_ID after creating OAuth credentials in Google Cloud."
             ),
         )
-    return GoogleAuthResponse(status="ok", configured=True, clientId=client_id, authUrl=auth_url, demoLogin=demo_login)
+    return GoogleAuthResponse(
+        status="ok",
+        configured=True,
+        clientId=client_id,
+        authUrl=auth_url,
+        redirectUri=redirect_uri,
+        demoLogin=demo_login,
+    )
 
 
 @app.get("/api/google/calendar/status")
-async def google_calendar_status() -> dict:
+async def google_calendar_status(request: Request) -> dict:
     configured = bool(os.getenv("GOOGLE_CLIENT_ID", "").strip())
     calendar_configured = _google_configured_for_calendar()
     connected = bool(_load_google_token())
+    redirect_uri = _google_redirect_uri(request)
     return {
         "status": "ok",
         "configured": configured,
         "calendarConfigured": calendar_configured,
         "connected": connected,
+        "redirectUri": redirect_uri,
+        "javascriptOrigin": _public_base_url(request),
         "mode": "connected" if connected else ("oauth-ready" if calendar_configured else "config-required"),
         "message": (
             "Google Calendar is connected and can sync events."
@@ -354,7 +378,7 @@ async def google_calendar_status() -> dict:
             else (
                 "Google Calendar OAuth can be started."
                 if calendar_configured
-                else "Google Calendar sync needs GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URI."
+                else "Google Calendar sync needs GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET."
             )
         ),
         "requiredScopes": ["openid", "email", "profile", "https://www.googleapis.com/auth/calendar.readonly"],
@@ -362,7 +386,7 @@ async def google_calendar_status() -> dict:
 
 
 @app.get("/api/auth/google/callback")
-async def google_auth_callback(code: str = "", error: str = "") -> RedirectResponse:
+async def google_auth_callback(request: Request, code: str = "", error: str = "") -> RedirectResponse:
     if error:
         return RedirectResponse(url=f"/?googleCalendar=error&detail={error}")
     if not code:
@@ -374,7 +398,7 @@ async def google_auth_callback(code: str = "", error: str = "") -> RedirectRespo
         "code": code,
         "client_id": os.getenv("GOOGLE_CLIENT_ID", "").strip(),
         "client_secret": os.getenv("GOOGLE_CLIENT_SECRET", "").strip(),
-        "redirect_uri": os.getenv("GOOGLE_REDIRECT_URI", "").strip(),
+        "redirect_uri": _google_redirect_uri(request),
         "grant_type": "authorization_code",
     }
     async with httpx.AsyncClient(timeout=20) as client:

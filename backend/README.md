@@ -542,12 +542,15 @@ POST /api/google/calendar/sync
 ```text
 GOOGLE_CLIENT_ID=<your-client-id>
 GOOGLE_CLIENT_SECRET=<your-client-secret>
-GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/api/auth/google/callback
 ```
 
-Trên Colab/Cloudflare, `GOOGLE_REDIRECT_URI` phải đổi theo public URL hiện tại, ví dụ:
+Backend tự tạo redirect URI theo URL người dùng đang mở. Trên Google Cloud, thêm đúng các URL app hiển thị trong Study Plan:
 
 ```text
+Authorized JavaScript origin:
+https://xxxx.trycloudflare.com
+
+Authorized redirect URI:
 https://xxxx.trycloudflare.com/api/auth/google/callback
 ```
 

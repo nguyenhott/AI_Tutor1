@@ -895,7 +895,11 @@ document.querySelector("#connect-google-calendar")?.addEventListener("click", as
       window.location.href = auth.authUrl;
       return;
     }
-    if (status) status.textContent = info.message || auth.message || "Google Calendar OAuth credentials are not configured.";
+    if (status) {
+      const originHint = info.javascriptOrigin ? ` Origin: ${info.javascriptOrigin}.` : "";
+      const redirectHint = info.redirectUri ? ` Redirect URI: ${info.redirectUri}.` : "";
+      status.textContent = `${info.message || auth.message || "Google Calendar OAuth credentials are not configured."}${originHint}${redirectHint}`;
+    }
     notify("Google Calendar needs OAuth credentials");
   } catch (error) {
     if (status) status.textContent = `Google Calendar unavailable: ${error.message}`;
