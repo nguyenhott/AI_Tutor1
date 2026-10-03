@@ -19,6 +19,7 @@ LANGUAGE_RULES = (
 
 
 class PracticeRequest(BaseModel):
+    courseId: str | None = None
     course: str = "Calculus II"
     topic: str = "Integration by parts"
     prompt: str = ""
@@ -55,6 +56,7 @@ class PracticeResponse(BaseModel):
 class PracticeSubmitRequest(BaseModel):
     question: PracticeQuestion
     answer: str
+    courseId: str | None = None
     course: str = "Calculus II"
     documentId: str | None = None
     currentMastery: int = Field(default=46, ge=0, le=100)

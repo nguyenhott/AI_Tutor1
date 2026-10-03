@@ -1,11 +1,16 @@
 ﻿import re
 import os
+import json
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlencode
 
+import httpx
+
+from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.assessment import (
@@ -35,8 +40,11 @@ from app.sources import (
 )
 from app.storage import (
     add_chat_message,
+    create_course,
+    get_course,
     get_chat_messages,
     get_topic_mastery,
+    list_courses,
     list_calendar_events,
     list_chat_sessions,
     list_quiz_attempts,
@@ -47,6 +55,7 @@ from app.storage import (
     upsert_chat_session,
 )
 
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 app = FastAPI(
     title="Personal AI Tutoring Tool Backend",
@@ -62,6 +71,7 @@ app.add_middleware(
 )
 
 ollama = OllamaClient()
+GOOGLE_TOKEN_PATH = Path(__file__).resolve().parents[1] / "data" / "google_calendar_token.json"
 
 
 class ChatRequest(BaseModel):
@@ -69,6 +79,7 @@ class ChatRequest(BaseModel):
     course: str = "Calculus II"
     topic: str = "Integration by parts"
     sessionId: str | None = None
+    courseId: str | None = None
 
 
 class ChatResponse(BaseModel):
@@ -98,6 +109,7 @@ class CalendarEventRequest(BaseModel):
     type: str = Field("assignment", max_length=40)
     dueDate: str = Field(..., min_length=8, max_length=30)
     source: str = Field("Personal calendar", max_length=80)
+    courseId: str | None = None
 
 
 class CalendarEventResponse(BaseModel):
@@ -112,6 +124,12 @@ class GoogleAuthResponse(BaseModel):
     authUrl: str = ""
     demoLogin: bool = False
     message: str = ""
+
+
+class CourseCreateRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=120)
+    description: str = Field("", max_length=240)
+    defaultTopic: str = Field("General review", max_length=120)
 
 
 def build_messages(request: ChatRequest, sources: list[Source]) -> list[dict]:
@@ -201,6 +219,61 @@ def _google_auth_url() -> str:
     return f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
 
 
+def _load_google_token() -> dict | None:
+    if not GOOGLE_TOKEN_PATH.exists():
+        return None
+    try:
+        return json.loads(GOOGLE_TOKEN_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
+def _save_google_token(token: dict) -> None:
+    GOOGLE_TOKEN_PATH.parent.mkdir(parents=True, exist_ok=True)
+    GOOGLE_TOKEN_PATH.write_text(json.dumps(token, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _google_configured_for_calendar() -> bool:
+    return bool(
+        os.getenv("GOOGLE_CLIENT_ID", "").strip()
+        and os.getenv("GOOGLE_CLIENT_SECRET", "").strip()
+        and os.getenv("GOOGLE_REDIRECT_URI", "").strip()
+    )
+
+
+async def _fetch_google_calendar_events(access_token: str, max_results: int = 20) -> list[dict]:
+    params = {
+        "calendarId": "primary",
+        "singleEvents": "true",
+        "orderBy": "startTime",
+        "maxResults": str(max_results),
+        "timeMin": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+    }
+    async with httpx.AsyncClient(timeout=20) as client:
+        response = await client.get(
+            "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+            params=params,
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+    if response.status_code >= 400:
+        raise HTTPException(status_code=502, detail=f"Google Calendar API error: {response.text[:300]}")
+    return response.json().get("items", [])
+
+
+def _calendar_event_to_deadline(event: dict, fallback_course: str = "Current course") -> dict:
+    start = event.get("start") or {}
+    due_date = start.get("date") or str(start.get("dateTime") or "")[:10]
+    title = event.get("summary") or "Google Calendar event"
+    return {
+        "course": fallback_course,
+        "topic": title,
+        "title": title,
+        "type": "exam" if "exam" in title.lower() or "midterm" in title.lower() else "review",
+        "dueDate": due_date,
+        "source": "Google Calendar",
+    }
+
+
 @app.get("/health")
 async def health() -> dict:
     return {"status": "ok"}
@@ -226,6 +299,26 @@ async def get_rag_status() -> dict:
     return {"status": "ok", "rag": rag_status()}
 
 
+@app.get("/api/courses")
+async def get_courses() -> dict:
+    return {"status": "ok", "courses": list_courses()}
+
+
+@app.post("/api/courses")
+async def add_course(request: CourseCreateRequest) -> dict:
+    try:
+        course = create_course(
+            name=request.name,
+            description=request.description,
+            default_topic=request.defaultTopic,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=409, detail=f"Cannot create course: {exc}") from exc
+    return {"status": "ok", "course": course}
+
+
 @app.get("/api/auth/google/login", response_model=GoogleAuthResponse)
 async def google_login() -> GoogleAuthResponse:
     client_id = os.getenv("GOOGLE_CLIENT_ID", "").strip()
@@ -247,27 +340,87 @@ async def google_login() -> GoogleAuthResponse:
 @app.get("/api/google/calendar/status")
 async def google_calendar_status() -> dict:
     configured = bool(os.getenv("GOOGLE_CLIENT_ID", "").strip())
+    calendar_configured = _google_configured_for_calendar()
+    connected = bool(_load_google_token())
     return {
         "status": "ok",
         "configured": configured,
-        "mode": "oauth-ready" if configured else "demo-placeholder",
+        "calendarConfigured": calendar_configured,
+        "connected": connected,
+        "mode": "connected" if connected else ("oauth-ready" if calendar_configured else "config-required"),
         "message": (
-            "Google Calendar OAuth URL can be generated."
-            if configured
-            else "Personal calendar and mock deadlines are active. Real Google Calendar sync needs Google Cloud OAuth credentials."
+            "Google Calendar is connected and can sync events."
+            if connected
+            else (
+                "Google Calendar OAuth can be started."
+                if calendar_configured
+                else "Google Calendar sync needs GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URI."
+            )
         ),
         "requiredScopes": ["openid", "email", "profile", "https://www.googleapis.com/auth/calendar.readonly"],
     }
 
 
+@app.get("/api/auth/google/callback")
+async def google_auth_callback(code: str = "", error: str = "") -> RedirectResponse:
+    if error:
+        return RedirectResponse(url=f"/?googleCalendar=error&detail={error}")
+    if not code:
+        return RedirectResponse(url="/?googleCalendar=error&detail=missing_code")
+    if not _google_configured_for_calendar():
+        return RedirectResponse(url="/?googleCalendar=error&detail=missing_google_secret")
+
+    payload = {
+        "code": code,
+        "client_id": os.getenv("GOOGLE_CLIENT_ID", "").strip(),
+        "client_secret": os.getenv("GOOGLE_CLIENT_SECRET", "").strip(),
+        "redirect_uri": os.getenv("GOOGLE_REDIRECT_URI", "").strip(),
+        "grant_type": "authorization_code",
+    }
+    async with httpx.AsyncClient(timeout=20) as client:
+        response = await client.post("https://oauth2.googleapis.com/token", data=payload)
+    if response.status_code >= 400:
+        return RedirectResponse(url="/?googleCalendar=error&detail=token_exchange_failed")
+    _save_google_token(response.json())
+    return RedirectResponse(url="/?googleCalendar=connected")
+
+
+@app.post("/api/google/calendar/sync")
+async def sync_google_calendar(course: str = "Current course") -> dict:
+    token = _load_google_token()
+    if not token or not token.get("access_token"):
+        raise HTTPException(status_code=401, detail="Google Calendar is not connected")
+
+    events = await _fetch_google_calendar_events(token["access_token"])
+    saved = []
+    for event in events:
+        deadline = _calendar_event_to_deadline(event, fallback_course=course)
+        if not deadline.get("dueDate"):
+            continue
+        saved.append(
+            save_calendar_event(
+                course=deadline["course"],
+                topic=deadline["topic"],
+                title=deadline["title"],
+                event_type=deadline["type"],
+                due_date=deadline["dueDate"],
+                source=deadline["source"],
+            )
+        )
+    return {"status": "ok", "imported": len(saved), "events": saved}
+
+
 @app.get("/api/documents")
-async def get_documents() -> dict:
-    return {"status": "ok", "documents": list_documents(), "rag": rag_status()}
+async def get_documents(course: str | None = None) -> dict:
+    rag = rag_status()
+    if course:
+        rag["documents"] = list_documents(course=course)
+    return {"status": "ok", "documents": list_documents(course=course), "rag": rag}
 
 
 @app.get("/api/chat/sessions")
-async def get_chat_sessions() -> dict:
-    return {"status": "ok", "sessions": list_chat_sessions()}
+async def get_chat_sessions(course: str | None = None) -> dict:
+    return {"status": "ok", "sessions": list_chat_sessions(course=course)}
 
 
 @app.get("/api/chat/sessions/{session_id}/messages")
@@ -279,37 +432,39 @@ async def get_session_messages(session_id: str) -> dict:
 
 
 @app.get("/api/practice/attempts")
-async def get_practice_attempts() -> dict:
-    return {"status": "ok", "attempts": list_quiz_attempts()}
+async def get_practice_attempts(course: str | None = None) -> dict:
+    return {"status": "ok", "attempts": list_quiz_attempts(course=course)}
 
 
 @app.get("/api/progress/monitor")
-async def get_progress_monitor() -> dict:
+async def get_progress_monitor(course: str | None = None) -> dict:
     return build_progress_report(
-        list_quiz_attempts(limit=100),
-        list_topic_mastery(),
-        list_calendar_events(),
+        list_quiz_attempts(limit=100, course=course),
+        list_topic_mastery(course=course),
+        list_calendar_events(course=course),
+        course=course,
     )
 
 
 @app.get("/api/study-plan")
-async def get_study_plan() -> dict:
+async def get_study_plan(course: str | None = None) -> dict:
     progress_report = build_progress_report(
-        list_quiz_attempts(limit=100),
-        list_topic_mastery(),
-        list_calendar_events(),
+        list_quiz_attempts(limit=100, course=course),
+        list_topic_mastery(course=course),
+        list_calendar_events(course=course),
+        course=course,
     )
     return build_study_plan(progress_report)
 
 
 @app.get("/api/integrations/mock-deadlines")
-async def get_mock_deadlines() -> dict:
-    return {"status": "ok", "deadlines": build_deadlines(list_calendar_events(), include_mock=True)}
+async def get_mock_deadlines(course: str | None = None) -> dict:
+    return {"status": "ok", "deadlines": build_deadlines(list_calendar_events(course=course), include_mock=True, course=course)}
 
 
 @app.get("/api/calendar/events")
-async def get_calendar_events() -> dict:
-    return {"status": "ok", "events": list_calendar_events()}
+async def get_calendar_events(course: str | None = None) -> dict:
+    return {"status": "ok", "events": list_calendar_events(course=course)}
 
 
 @app.post("/api/calendar/events", response_model=CalendarEventResponse)
@@ -323,6 +478,7 @@ async def add_calendar_event(request: CalendarEventRequest) -> CalendarEventResp
         event_type=request.type,
         due_date=request.dueDate,
         source=request.source,
+        course_id=request.courseId,
     )
     return CalendarEventResponse(status="ok", event=event)
 
@@ -342,6 +498,8 @@ async def upload_document(
     file: UploadFile = File(...),
     title: str = Form(""),
     keywords: str = Form(""),
+    course: str = Form(""),
+    courseId: str = Form(""),
 ) -> DocumentUploadResponse:
     saved_path = await _save_upload(file)
     result = await index_document_file(
@@ -351,6 +509,8 @@ async def upload_document(
         embedder=ollama.embed_texts,
         embedding_model=ollama.embedding_model,
         replace_existing_document=True,
+        course=course.strip() or None,
+        course_id=courseId.strip() or None,
     )
     return DocumentUploadResponse(status="ok", document=result, rag=rag_status())
 
@@ -366,6 +526,7 @@ async def recommend_practice_questions(request: PracticeRequest) -> PracticeResp
         request.topic,
         embedder=ollama.embed_texts,
         document_id=request.documentId,
+        course=request.course,
     )
     try:
         return await generate_practice_with_llm(request, sources, ollama.chat)
@@ -384,6 +545,7 @@ async def submit_practice_answer(request: PracticeSubmitRequest) -> PracticeSubm
             request.question.model_dump(),
             request.answer,
             result.model_dump(),
+            course_id=request.courseId,
         )
         return result
 
@@ -393,6 +555,7 @@ async def submit_practice_answer(request: PracticeSubmitRequest) -> PracticeSubm
         request.question.topic,
         embedder=ollama.embed_texts,
         document_id=request.documentId,
+        course=request.course,
     )
     try:
         result = await evaluate_answer_with_llm(request, sources, ollama.chat)
@@ -405,20 +568,21 @@ async def submit_practice_answer(request: PracticeSubmitRequest) -> PracticeSubm
         request.question.model_dump(),
         request.answer,
         result.model_dump(),
+        course_id=request.courseId,
     )
     return result
 
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest) -> ChatResponse:
-    session_id = upsert_chat_session(request.sessionId, request.course, request.topic, request.message)
+    session_id = upsert_chat_session(request.sessionId, request.course, request.topic, request.message, request.courseId)
     add_chat_message(
         session_id,
         "user",
         request.message,
         {"course": request.course, "topic": request.topic},
     )
-    sources = await retrieve_sources(request.message, request.topic, embedder=ollama.embed_texts)
+    sources = await retrieve_sources(request.message, request.topic, embedder=ollama.embed_texts, course=request.course)
     try:
         answer = await ollama.chat(build_messages(request, sources))
     except OllamaError as exc:
@@ -448,7 +612,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
 
 @app.post("/api/chat/stream")
 async def chat_stream(request: ChatRequest) -> StreamingResponse:
-    sources = await retrieve_sources(request.message, request.topic, embedder=ollama.embed_texts)
+    sources = await retrieve_sources(request.message, request.topic, embedder=ollama.embed_texts, course=request.course)
 
     async def token_stream():
         try:

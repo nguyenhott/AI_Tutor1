@@ -120,10 +120,16 @@ def normalize_deadline(event: dict) -> dict:
     }
 
 
-def build_deadlines(calendar_events: list[dict] | None = None, include_mock: bool = True) -> list[dict]:
+def build_deadlines(
+    calendar_events: list[dict] | None = None,
+    include_mock: bool = True,
+    course: str | None = None,
+) -> list[dict]:
     deadlines = [normalize_deadline(event) for event in (calendar_events or [])]
     if include_mock:
         deadlines.extend(MOCK_DEADLINES)
+    if course:
+        deadlines = [deadline for deadline in deadlines if deadline.get("course") == course]
     return sorted(
         [deadline for deadline in deadlines if deadline.get("dueDate")],
         key=lambda item: item["dueDate"],
@@ -134,8 +140,9 @@ def build_progress_report(
     attempts: list[dict],
     mastery_rows: list[dict],
     deadlines: list[dict] | None = None,
+    course: str | None = None,
 ) -> dict:
-    deadlines = build_deadlines(deadlines, include_mock=True)
+    deadlines = build_deadlines(deadlines, include_mock=True, course=course)
     by_topic: dict[tuple[str, str], dict] = {}
 
     for row in mastery_rows:
@@ -171,6 +178,8 @@ def build_progress_report(
 
     if not by_topic:
         for item in DEFAULT_PROGRESS:
+            if course and item["course"] != course:
+                continue
             by_topic[(item["course"], item["topic"])] = {**item, "scores": []}
 
     topics = []

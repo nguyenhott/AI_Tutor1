@@ -117,6 +117,10 @@ main { min-width: 0; max-width: 1500px; margin: 0 auto; padding: 0 34px 50px; ov
 .course-card-button strong { display: block; font-size: 22px; margin-bottom: 12px; }
 .course-card-button small { color: var(--muted); line-height: 1.5; }
 .course-card-button:hover { border-color: var(--green); background: white; transform: translateY(-1px); }
+.course-card-button.active { border-color: var(--green); box-shadow: 0 16px 34px rgba(37, 99, 235, .14); }
+.course-create-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+.course-create-form input { min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 11px; background: white; color: var(--ink); outline-color: var(--green); }
+.course-create-form small { grid-column: 1 / -1; color: var(--muted); }
 .mini-stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
 .mini-stat { border: 1px solid var(--line); border-radius: 12px; padding: 15px; background: #f8fbff; }
 .mini-stat span, .mini-stat small { display: block; color: var(--muted); font-size: 12px; }
@@ -198,13 +202,15 @@ main { min-width: 0; max-width: 1500px; margin: 0 auto; padding: 0 34px 50px; ov
 .feedback p { margin: 0 0 8px; }
 .feedback p:last-child { margin-bottom: 0; }
 .hidden { display: none !important; }
-.week-grid, .calendar-board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
-.calendar-day { min-height: 260px; border: 1px solid var(--line); border-radius: 14px; background: white; padding: 12px; box-shadow: 0 12px 28px rgba(15, 23, 42, .06); }
-.calendar-day header { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid #edf0e9; padding-bottom: 10px; margin-bottom: 10px; }
+.week-grid, .calendar-board { display: grid; grid-template-columns: repeat(7, minmax(140px, 1fr)); gap: 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: white; box-shadow: var(--shadow); }
+.calendar-day { min-height: 320px; border-right: 1px solid var(--line); background: white; padding: 0; box-shadow: none; }
+.calendar-day:last-child { border-right: 0; }
+.calendar-day header { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--line); padding: 12px; margin-bottom: 0; background: #f8fbff; }
 .calendar-day header strong { color: var(--green); }
 .calendar-day header small { color: var(--muted); }
-.calendar-event { border-left: 4px solid var(--green); background: #eff6ff; border-radius: 8px; padding: 10px; margin-bottom: 9px; line-height: 1.35; }
+.calendar-event { border-left: 4px solid var(--green); background: #eff6ff; border-radius: 8px; padding: 10px; margin: 10px; line-height: 1.35; }
 .calendar-event.priority { border-left-color: var(--orange); background: #fff4ef; }
+.calendar-event span { display: block; color: var(--green); font-size: 11px; font-weight: 900; margin-bottom: 5px; }
 .calendar-event strong, .calendar-event small { display: block; }
 .calendar-event small { color: var(--muted); margin-top: 5px; }
 .day-card { padding: 20px; min-height: 230px; }
@@ -234,6 +240,7 @@ main { min-width: 0; max-width: 1500px; margin: 0 auto; padding: 0 34px 50px; ov
   .login-layout { grid-template-columns: 1fr; padding: 22px; }
   .login-preview { min-height: auto; }
   .stat-grid, .week-grid, .calendar-board, .course-picker { grid-template-columns: repeat(2, 1fr); }
+  .course-create-form { grid-template-columns: 1fr; }
   .practice-source { grid-template-columns: 1fr; }
   .practice-settings { grid-template-columns: 1fr 1fr; }
   .content-grid, .tutor-layout, .course-hub-layout { grid-template-columns: 1fr; height: auto; }

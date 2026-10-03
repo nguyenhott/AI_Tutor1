@@ -133,8 +133,8 @@ def extract_pdf_pages(file_path: Path) -> tuple[list[dict], list[dict]]:
     return pages, skipped
 
 
-def list_documents() -> list[dict]:
-    chroma_documents = list_chroma_documents()
+def list_documents(course: str | None = None) -> list[dict]:
+    chroma_documents = list_chroma_documents(course=course)
     index = load_index()
     documents: dict[str, dict] = {
         chroma_doc["documentId"]: chroma_doc for chroma_doc in chroma_documents
@@ -142,6 +142,8 @@ def list_documents() -> list[dict]:
     chroma_document_ids = set(documents)
 
     for chunk in index.get("chunks", []):
+        if course and chunk.get("course") != course:
+            continue
         document_id = chunk.get("documentId") or "unknown"
         if document_id in chroma_document_ids:
             continue
@@ -149,6 +151,8 @@ def list_documents() -> list[dict]:
             document_id,
             {
                 "documentId": document_id,
+                "course": chunk.get("course") or "",
+                "courseId": chunk.get("courseId") or "",
                 "title": chunk.get("title") or "Course Document",
                 "sourcePath": chunk.get("sourcePath") or "",
                 "chunks": 0,
@@ -222,6 +226,8 @@ async def index_document_file(
     embedder: Embedder | None = None,
     embedding_model: str | None = None,
     replace_existing_document: bool = True,
+    course: str | None = None,
+    course_id: str | None = None,
 ) -> dict:
     title = title or file_path.stem
     keywords = keywords or []
@@ -237,6 +243,8 @@ async def index_document_file(
                 {
                     "chunkId": f"{document_id}-p{page['page']}-c{chunk_index}",
                     "documentId": document_id,
+                    "course": course or "",
+                    "courseId": course_id or "",
                     "title": title,
                     "sourcePath": str(file_path),
                     "page": page["page"],
@@ -270,6 +278,8 @@ async def index_document_file(
 
     return {
         "documentId": document_id,
+        "course": course or "",
+        "courseId": course_id or "",
         "title": title,
         "sourcePath": str(file_path),
         "pagesScanned": len(pages),

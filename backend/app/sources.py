@@ -110,13 +110,14 @@ async def retrieve_sources(
     top_k: int = 4,
     embedder: Embedder | None = None,
     document_id: str | None = None,
+    course: str | None = None,
 ) -> list[Source]:
     query_text = f"{topic} {question}".strip()
 
     if embedder is not None:
         try:
             query_embedding = (await embedder([query_text]))[0]
-            chroma_results = query_chunks(query_embedding, top_k=top_k, document_id=document_id)
+            chroma_results = query_chunks(query_embedding, top_k=top_k, document_id=document_id, course=course)
             if chroma_results:
                 return [
                     _as_source(f"S{index + 1}", chunk, float(chunk.get("score") or 0))
@@ -130,6 +131,8 @@ async def retrieve_sources(
     chunks = index.get("chunks", [])
     if document_id:
         chunks = [chunk for chunk in chunks if chunk.get("documentId") == document_id]
+    elif course:
+        chunks = [chunk for chunk in chunks if chunk.get("course") == course]
     if not chunks:
         return FALLBACK_SOURCES
 

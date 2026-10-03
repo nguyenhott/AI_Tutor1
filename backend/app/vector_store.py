@@ -26,6 +26,8 @@ def get_collection():
 def _metadata(chunk: dict, embedding_model: str | None) -> dict[str, Any]:
     return {
         "documentId": str(chunk.get("documentId") or ""),
+        "course": str(chunk.get("course") or ""),
+        "courseId": str(chunk.get("courseId") or ""),
         "title": str(chunk.get("title") or "Course Document"),
         "sourcePath": str(chunk.get("sourcePath") or ""),
         "page": int(chunk.get("page") or 0),
@@ -75,7 +77,12 @@ def delete_document(document_id: str) -> dict:
     }
 
 
-def query_chunks(query_embedding: list[float], top_k: int = 4, document_id: str | None = None) -> list[dict]:
+def query_chunks(
+    query_embedding: list[float],
+    top_k: int = 4,
+    document_id: str | None = None,
+    course: str | None = None,
+) -> list[dict]:
     collection = get_collection()
     if collection.count() == 0:
         return []
@@ -87,6 +94,8 @@ def query_chunks(query_embedding: list[float], top_k: int = 4, document_id: str 
     }
     if document_id:
         query_kwargs["where"] = {"documentId": document_id}
+    elif course:
+        query_kwargs["where"] = {"course": course}
 
     result = collection.query(**query_kwargs)
 
@@ -102,6 +111,8 @@ def query_chunks(query_embedding: list[float], top_k: int = 4, document_id: str 
             {
                 "chunkId": chunk_id,
                 "documentId": metadata.get("documentId", ""),
+                "course": metadata.get("course", ""),
+                "courseId": metadata.get("courseId", ""),
                 "title": metadata.get("title", "Course Document"),
                 "sourcePath": metadata.get("sourcePath", ""),
                 "page": int(metadata.get("page", 0)),
@@ -112,7 +123,7 @@ def query_chunks(query_embedding: list[float], top_k: int = 4, document_id: str 
     return chunks
 
 
-def list_documents() -> list[dict]:
+def list_documents(course: str | None = None) -> list[dict]:
     collection = get_collection()
     if collection.count() == 0:
         return []
@@ -120,11 +131,15 @@ def list_documents() -> list[dict]:
     raw = collection.get(include=["metadatas"])
     documents: dict[str, dict] = {}
     for metadata in raw.get("metadatas", []):
+        if course and metadata.get("course") != course:
+            continue
         document_id = metadata.get("documentId") or "unknown"
         doc = documents.setdefault(
             document_id,
             {
                 "documentId": document_id,
+                "course": metadata.get("course") or "",
+                "courseId": metadata.get("courseId") or "",
                 "title": metadata.get("title") or "Course Document",
                 "sourcePath": metadata.get("sourcePath") or "",
                 "chunks": 0,

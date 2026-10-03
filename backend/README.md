@@ -11,12 +11,13 @@ Backend dùng FastAPI để cung cấp các chức năng chính cho Personal AI 
 - Retrieve tài liệu bằng Chroma vector search.
 - Fallback về JSON/keyword retrieval nếu Chroma hoặc embedding chưa sẵn sàng.
 - Lưu chat history, quiz attempts, và topic mastery bằng SQLite.
+- Quản lý course riêng, mỗi course có tài liệu, chat, quiz, progress và study plan riêng.
 - Sinh adaptive practice theo tài liệu đã chọn, topic, độ khó, số câu, và loại câu.
 - Chấm multiple choice và short answer dựa trên tài liệu upload/RAG.
 - Theo dõi tiến độ học bằng Progress Monitor Agent dựa trên quiz history/topic mastery.
 - Tạo in-app weak-topic alerts và Study Plan động từ weak topics + mock LMS/calendar deadlines.
 - Lưu lịch cá nhân của học sinh gồm exam/quiz/assignment/review để ưu tiên ôn tập môn sắp thi.
-- Thêm login/course start flow, giao diện Study Plan dạng calendar, và Google Calendar OAuth-ready placeholder.
+- Thêm login/course start flow, giao diện Study Plan dạng Google Calendar, và Google Calendar OAuth/sync khi cấu hình đủ credentials.
 
 ## 1. Models Cần Pull
 
@@ -67,6 +68,7 @@ OLLAMA_EMBED_BATCH_SIZE=16
 CHROMA_DB_DIR=./data/chroma
 CHROMA_COLLECTION=course_materials
 GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/api/auth/google/callback
 ```
 
@@ -449,6 +451,8 @@ APIs:
 ```text
 GET /api/chat/sessions
 GET /api/chat/sessions/{session_id}/messages
+GET /api/courses
+POST /api/courses
 GET /api/practice/attempts
 GET /api/progress/monitor
 GET /api/study-plan
@@ -457,6 +461,7 @@ GET /api/calendar/events
 POST /api/calendar/events
 GET /api/auth/google/login
 GET /api/google/calendar/status
+POST /api/google/calendar/sync
 ```
 
 ## 14. Progress Monitor / Planner / Mock Integration
@@ -524,20 +529,29 @@ Google Sign-In dùng Google Identity Services ở frontend. Backend cung cấp `
 GET /api/auth/google/login
 ```
 
-Google Calendar integration hiện ở trạng thái OAuth-ready placeholder:
+Google Calendar integration có OAuth callback và sync events:
 
 ```text
 GET /api/google/calendar/status
+GET /api/auth/google/callback
+POST /api/google/calendar/sync
 ```
 
-Nếu muốn bật Google Calendar thật, enable Google Calendar API, rồi set:
+Để bật Google Calendar thật, enable Google Calendar API, tạo OAuth Client loại Web application, rồi set:
 
 ```text
 GOOGLE_CLIENT_ID=<your-client-id>
+GOOGLE_CLIENT_SECRET=<your-client-secret>
 GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/api/auth/google/callback
 ```
 
-Sau đó có thể thay API nhập tay/mock deadlines bằng dữ liệu events lấy từ Google Calendar API.
+Trên Colab/Cloudflare, `GOOGLE_REDIRECT_URI` phải đổi theo public URL hiện tại, ví dụ:
+
+```text
+https://xxxx.trycloudflare.com/api/auth/google/callback
+```
+
+Sau khi connect, bấm **Sync Google Calendar** trong Study Plan để import events vào SQLite và dùng trong alerts/study plan.
 
 ## 15. Current Demo Scope And Future Work
 

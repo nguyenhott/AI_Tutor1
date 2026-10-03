@@ -111,6 +111,12 @@
                 <small>Integration techniques and applications</small>
               </button>
             </div>
+            <form class="course-create-form" id="course-create-form">
+              <input id="new-course-name" type="text" placeholder="New course name" required>
+              <input id="new-course-topic" type="text" placeholder="Default topic, e.g. Recursion">
+              <button class="secondary" type="submit">Create course</button>
+              <small id="course-create-status">New courses keep their own materials, chats, quizzes, and plan.</small>
+            </form>
           </article>
           <article class="panel course-hub-overview">
             <div class="panel-heading"><div><p class="eyebrow">TODAY'S OVERVIEW</p><h2>Learning status</h2></div><button class="text-button" data-view-button="plan">Plan</button></div>
@@ -352,6 +358,7 @@
               <strong>Google Calendar</strong>
               <small id="google-calendar-status">Connect requires Google Cloud OAuth credentials.</small>
               <button class="secondary full" id="connect-google-calendar" type="button">Connect Google Calendar</button>
+              <button class="secondary full" id="sync-google-calendar" type="button">Sync Google Calendar</button>
             </div>
             <div id="calendar-events">
               <div class="source-card"><strong>No personal calendar yet</strong><small>Add an exam or assignment to personalize the plan.</small></div>

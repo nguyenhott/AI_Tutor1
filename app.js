@@ -8,6 +8,8 @@ const API_BASE = ["localhost", "127.0.0.1"].includes(window.location.hostname) &
   ? LOCAL_BACKEND
   : window.location.origin;
 let availableDocuments = [];
+let availableCourses = [];
+let currentCourseId = "course-c-programming";
 let currentPracticeTopic = "Pointers in C";
 let currentPracticeCourse = "C Programming";
 let currentPracticePrompt = "Pointers in C";
@@ -38,6 +40,70 @@ function escapeHtml(value) {
 function setText(selector, value) {
   const element = document.querySelector(selector);
   if (element) element.textContent = value;
+}
+
+function courseQuery() {
+  return currentPracticeCourse ? `?course=${encodeURIComponent(currentPracticeCourse)}` : "";
+}
+
+function courseByName(name) {
+  return availableCourses.find((course) => course.name === name);
+}
+
+function renderCoursePicker(courses = []) {
+  const picker = document.querySelector("#course-picker");
+  if (!picker) return;
+  picker.innerHTML = courses.map((course) => `
+    <button class="course-card-button ${course.id === currentCourseId ? "active" : ""}"
+      data-course-id="${escapeHtml(course.id)}"
+      data-course="${escapeHtml(course.name)}"
+      data-topic="${escapeHtml(course.default_topic || course.defaultTopic || "General review")}">
+      <strong>${escapeHtml(course.name)}</strong>
+      <small>${escapeHtml(course.description || "Personal course workspace")}</small>
+    </button>
+  `).join("");
+
+  picker.querySelectorAll(".course-card-button").forEach((button) => {
+    button.addEventListener("click", () => selectCourse({
+      id: button.dataset.courseId,
+      name: button.dataset.course,
+      default_topic: button.dataset.topic
+    }));
+  });
+}
+
+async function loadCourses() {
+  try {
+    const data = await fetchJson("/api/courses");
+    availableCourses = data.courses || [];
+    if (availableCourses.length) {
+      const selected = availableCourses.find((course) => course.id === currentCourseId) || availableCourses[0];
+      currentCourseId = selected.id;
+      if (!currentPracticeCourse) currentPracticeCourse = selected.name;
+      renderCoursePicker(availableCourses);
+    }
+  } catch (error) {
+    notify(`Courses unavailable: ${error.message}`);
+  }
+}
+
+async function selectCourse(course) {
+  currentCourseId = course.id || currentCourseId;
+  updateLearningContext({
+    course: course.name,
+    topic: course.default_topic || course.defaultTopic || "General review",
+    prompt: course.default_topic || course.defaultTopic || "General review",
+    documentId: "",
+    sessionId: null
+  });
+  renderCoursePicker(availableCourses);
+  clearMessages();
+  addMessage(`Course set to ${currentPracticeCourse}. Current focus: ${currentPracticeTopic}.`, "tutor", "Course context");
+  await refreshRagStatus();
+  await loadChatSessions();
+  await refreshDashboard();
+  notify(`Course selected: ${currentPracticeCourse}`);
+  showView("tutor");
 }
 
 function decodeGoogleCredential(credential) {
@@ -393,7 +459,7 @@ function renderStudyPlan(plan) {
     rationale.textContent = plan.rationale || "The plan prioritizes weak topics first, then upcoming deadlines.";
   }
 
-  const days = ["MON", "TUE", "WED", "THU", "FRI"];
+  const days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
   const byDay = new Map(days.map((day) => [day, []]));
   plan.items.slice(0, 8).forEach((item, index) => {
     const day = item.day || days[index % days.length];
@@ -404,14 +470,15 @@ function renderStudyPlan(plan) {
   grid.classList.add("calendar-board");
   grid.innerHTML = [...byDay.entries()].map(([day, items]) => `
     <article class="calendar-day">
-      <header><strong>${escapeHtml(day)}</strong><small>${escapeHtml(formatShortDate(items[0]?.date) || "This week")}</small></header>
+      <header><strong>${escapeHtml(day)}</strong><small>${escapeHtml(formatShortDate(items[0]?.date) || "Open")}</small></header>
       ${items.length ? items.map((item) => {
         const priority = item.priority === "High";
         const deadline = item.deadline ? `${item.deadline.title} due ${item.deadline.dueDate}` : item.reason;
         return `
           <div class="calendar-event ${priority ? "priority" : ""}">
+            <span>${Number(item.minutes || 25)} min</span>
             <strong>${escapeHtml(item.topic)}</strong>
-            <small>${Number(item.minutes || 25)} min - ${escapeHtml(item.course)}</small>
+            <small>${escapeHtml(item.course)}</small>
             <small>${escapeHtml(item.activity)}. ${escapeHtml(deadline || "")}</small>
           </div>
         `;
@@ -442,11 +509,11 @@ function renderCalendarEvents(events = []) {
 
 async function refreshDashboard() {
   const [documentsResult, sessionsResult, attemptsResult, progressResult, planResult] = await Promise.allSettled([
-    fetchJson("/api/documents"),
-    fetchJson("/api/chat/sessions"),
-    fetchJson("/api/practice/attempts"),
-    fetchJson("/api/progress/monitor"),
-    fetchJson("/api/study-plan")
+    fetchJson(`/api/documents${courseQuery()}`),
+    fetchJson(`/api/chat/sessions${courseQuery()}`),
+    fetchJson(`/api/practice/attempts${courseQuery()}`),
+    fetchJson(`/api/progress/monitor${courseQuery()}`),
+    fetchJson(`/api/study-plan${courseQuery()}`)
   ]);
 
   const documentsData = documentsResult.status === "fulfilled" ? documentsResult.value : {};
@@ -560,7 +627,7 @@ function startPracticeFromDocument(documentId) {
   const doc = availableDocuments.find((item) => item.documentId === documentId);
   if (!doc) return;
   updateLearningContext({
-    course: inferCourseFromDocument(doc),
+    course: currentPracticeCourse,
     topic: inferTopicFromDocument(doc),
     prompt: inferTopicFromDocument(doc),
     documentId,
@@ -577,7 +644,7 @@ async function refreshRagStatus() {
   if (!statusCard || !documentsBox) return;
 
   try {
-    const response = await fetch(`${API_BASE}/api/documents`);
+    const response = await fetch(`${API_BASE}/api/documents${courseQuery()}`);
     if (!response.ok) throw new Error(`Backend returned ${response.status}`);
     const data = await response.json();
     const rag = data.rag || {};
@@ -597,12 +664,29 @@ async function refreshRagStatus() {
   }
 }
 
-refreshRagStatus();
-loadChatSessions();
-refreshDashboard();
+async function bootstrapWorkspace() {
+  await loadCourses();
+  await refreshRagStatus();
+  await loadChatSessions();
+  await refreshDashboard();
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("googleCalendar") === "connected") {
+    notify("Google Calendar connected");
+    const status = document.querySelector("#google-calendar-status");
+    if (status) status.textContent = "Google Calendar connected. Click Sync Google Calendar to import events.";
+  } else if (params.get("googleCalendar") === "error") {
+    notify("Google Calendar connection failed");
+  }
+}
+
+bootstrapWorkspace();
 
 function updateLearningContext({ course, topic, prompt, sessionId, documentId } = {}) {
-  if (course) currentPracticeCourse = course.trim() || currentPracticeCourse;
+  if (course) {
+    currentPracticeCourse = course.trim() || currentPracticeCourse;
+    const matchedCourse = courseByName(currentPracticeCourse);
+    if (matchedCourse) currentCourseId = matchedCourse.id;
+  }
   if (topic) currentPracticeTopic = topic.trim() || currentPracticeTopic;
   if (prompt) currentPracticePrompt = prompt.trim() || currentPracticePrompt;
   if (documentId !== undefined) currentPracticeDocumentId = documentId || "";
@@ -683,19 +767,41 @@ document.querySelector("#google-login")?.addEventListener("click", async () => {
   if (!ready) notify("Google Sign-In config required");
 });
 document.querySelector("#demo-login")?.addEventListener("click", completeDemoLogin);
+document.querySelector("#course-create-form")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const status = document.querySelector("#course-create-status");
+  const nameInput = document.querySelector("#new-course-name");
+  const topicInput = document.querySelector("#new-course-topic");
+  const payload = {
+    name: nameInput?.value.trim() || "",
+    description: topicInput?.value.trim() ? `Focus: ${topicInput.value.trim()}` : "Custom course workspace",
+    defaultTopic: topicInput?.value.trim() || "General review"
+  };
+  if (!payload.name) return;
+  if (status) status.textContent = "Creating course...";
+  try {
+    const response = await fetch(`${API_BASE}/api/courses`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || `Backend returned ${response.status}`);
+    await loadCourses();
+    event.target.reset();
+    if (status) status.textContent = "Course created. It now has separate materials, chats, quizzes, and plan.";
+    await selectCourse(data.course);
+  } catch (error) {
+    if (status) status.textContent = `Course create failed: ${error.message}`;
+  }
+});
 document.querySelectorAll(".course-card-button").forEach((button) => {
   button.addEventListener("click", () => {
-    updateLearningContext({
-      course: button.dataset.course,
-      topic: button.dataset.topic,
-      prompt: button.dataset.topic,
-      sessionId: null
+    selectCourse({
+      id: button.dataset.courseId,
+      name: button.dataset.course,
+      default_topic: button.dataset.topic
     });
-    clearMessages();
-    addMessage(`Course set to ${currentPracticeCourse}. Current focus: ${currentPracticeTopic}.`, "tutor", "Course context");
-    notify(`Course selected: ${currentPracticeCourse}`);
-    showView("tutor");
-    refreshDashboard();
   });
 });
 document.querySelector("[data-open-tutor]").addEventListener("click", () => {
@@ -723,7 +829,7 @@ document.querySelector("#practice-document").addEventListener("change", (event) 
   const documentId = event.target.value;
   const doc = availableDocuments.find((item) => item.documentId === documentId);
   updateLearningContext({
-    course: doc ? inferCourseFromDocument(doc) : currentPracticeCourse,
+    course: currentPracticeCourse,
     topic: doc ? inferTopicFromDocument(doc) : currentPracticeTopic,
     prompt: doc ? inferTopicFromDocument(doc) : currentPracticePrompt,
     documentId
@@ -742,6 +848,7 @@ if (calendarForm) {
     event.preventDefault();
     const status = document.querySelector("#calendar-status");
     const payload = {
+      courseId: currentCourseId,
       course: document.querySelector("#calendar-course")?.value || currentPracticeCourse,
       topic: document.querySelector("#calendar-topic")?.value || currentPracticeTopic,
       title: document.querySelector("#calendar-title")?.value || "Study event",
@@ -780,7 +887,11 @@ document.querySelector("#connect-google-calendar")?.addEventListener("click", as
   try {
     const info = await fetchJson("/api/google/calendar/status");
     const auth = await fetchJson("/api/auth/google/login");
-    if (auth.configured && auth.authUrl) {
+    if (info.connected) {
+      if (status) status.textContent = "Google Calendar is already connected. Use Sync Google Calendar.";
+      return;
+    }
+    if (info.calendarConfigured && auth.configured && auth.authUrl) {
       window.location.href = auth.authUrl;
       return;
     }
@@ -789,6 +900,23 @@ document.querySelector("#connect-google-calendar")?.addEventListener("click", as
   } catch (error) {
     if (status) status.textContent = `Google Calendar unavailable: ${error.message}`;
     notify("Google Calendar connection failed");
+  }
+});
+document.querySelector("#sync-google-calendar")?.addEventListener("click", async () => {
+  const status = document.querySelector("#google-calendar-status");
+  if (status) status.textContent = "Syncing Google Calendar events...";
+  try {
+    const response = await fetch(`${API_BASE}/api/google/calendar/sync?course=${encodeURIComponent(currentPracticeCourse)}`, {
+      method: "POST"
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || `Backend returned ${response.status}`);
+    if (status) status.textContent = `Imported ${data.imported || 0} Google Calendar events.`;
+    await refreshDashboard();
+    notify("Google Calendar synced");
+  } catch (error) {
+    if (status) status.textContent = `Sync failed: ${error.message}`;
+    notify("Google Calendar sync failed");
   }
 });
 document.querySelector("#topic-form").addEventListener("submit", (event) => {
@@ -854,6 +982,7 @@ async function askBackendTutor(input, onToken) {
       signal: controller.signal,
       body: JSON.stringify({
         message: input,
+        courseId: currentCourseId,
         course: currentPracticeCourse,
         topic: currentPracticeTopic,
         sessionId: currentSessionId
@@ -916,7 +1045,7 @@ async function loadChatSessions() {
   if (!box) return;
 
   try {
-    const response = await fetch(`${API_BASE}/api/chat/sessions`);
+    const response = await fetch(`${API_BASE}/api/chat/sessions${courseQuery()}`);
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || `Backend returned ${response.status}`);
 
@@ -969,7 +1098,6 @@ document.querySelector("#chat-form").addEventListener("submit", async (event) =>
   if (!text) return;
   const detectedTopic = guessTopic(text);
   updateLearningContext({
-    course: guessCourse(detectedTopic),
     topic: detectedTopic,
     prompt: text
   });
@@ -1010,6 +1138,8 @@ if (uploadForm) {
     formData.append("file", fileInput.files[0]);
     formData.append("title", titleInput.value.trim() || fileInput.files[0].name);
     formData.append("keywords", keywordsInput.value.trim());
+    formData.append("course", currentPracticeCourse);
+    formData.append("courseId", currentCourseId);
     const requestedTopic = keywordsInput.value.split(",").map((item) => item.trim()).find(Boolean);
 
     uploadStatus.textContent = "Uploading, chunking, and embedding document...";
@@ -1027,7 +1157,7 @@ if (uploadForm) {
       uploadForm.reset();
       await refreshRagStatus();
       updateLearningContext({
-        course: inferCourseFromDocument(doc),
+        course: currentPracticeCourse,
         topic: requestedTopic || inferTopicFromDocument(doc),
         prompt: requestedTopic || inferTopicFromDocument(doc),
         documentId: doc.documentId,
@@ -1127,6 +1257,7 @@ async function loadPracticeQuestions() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        courseId: currentCourseId,
         course: currentPracticeCourse,
         topic: currentPracticeTopic,
         prompt: currentPracticePrompt,
@@ -1206,6 +1337,7 @@ async function submitPracticeAnswer(answer, selectedButton) {
       body: JSON.stringify({
         question: currentQuestion,
         answer,
+        courseId: currentCourseId,
         course: currentPracticeCourse,
         documentId: currentPracticeDocumentId || null,
         currentMastery

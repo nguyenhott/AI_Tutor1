@@ -9,6 +9,11 @@ from typing import Any
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DB_PATH = Path(os.getenv("LEARNING_DB_PATH", str(DATA_DIR / "tutorflow.sqlite")))
+DEFAULT_COURSES = [
+    ("course-c-programming", "C Programming", "Pointers, arrays, functions, memory basics", "Pointers in C"),
+    ("course-electric-circuits", "Electric Circuits", "Ohm's law, KVL, KCL, nodal and mesh analysis", "Ohm's law"),
+    ("course-calculus-ii", "Calculus II", "Integration techniques and applications", "Integration by parts"),
+]
 
 
 def _connect() -> sqlite3.Connection:
@@ -22,6 +27,15 @@ def init_db() -> None:
     with _connect() as connection:
         connection.executescript(
             """
+            CREATE TABLE IF NOT EXISTS courses (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL UNIQUE,
+                description TEXT NOT NULL DEFAULT '',
+                default_topic TEXT NOT NULL DEFAULT 'General review',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
             CREATE TABLE IF NOT EXISTS chat_sessions (
                 id TEXT PRIMARY KEY,
                 course TEXT NOT NULL,
@@ -74,6 +88,28 @@ def init_db() -> None:
             );
             """
         )
+        for course_id, name, description, default_topic in DEFAULT_COURSES:
+            connection.execute(
+                """
+                INSERT OR IGNORE INTO courses (id, name, description, default_topic)
+                VALUES (?, ?, ?, ?)
+                """,
+                (course_id, name, description, default_topic),
+            )
+
+        _ensure_column(connection, "chat_sessions", "course_id", "TEXT")
+        _ensure_column(connection, "quiz_attempts", "course_id", "TEXT")
+        _ensure_column(connection, "topic_mastery", "course_id", "TEXT")
+        _ensure_column(connection, "calendar_events", "course_id", "TEXT")
+
+
+def _ensure_column(connection: sqlite3.Connection, table_name: str, column_name: str, definition: str) -> None:
+    columns = {
+        row["name"]
+        for row in connection.execute(f"PRAGMA table_info({table_name})").fetchall()
+    }
+    if column_name not in columns:
+        connection.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {definition}")
 
 
 def _row_to_dict(row: sqlite3.Row) -> dict:
@@ -84,11 +120,78 @@ def _json(data: Any) -> str:
     return json.dumps(data, ensure_ascii=False)
 
 
+def _slug(value: str) -> str:
+    normalized = value.lower().strip()
+    normalized = "".join(char if char.isalnum() else "-" for char in normalized)
+    normalized = "-".join(part for part in normalized.split("-") if part)
+    return normalized[:44] or "course"
+
+
+def list_courses() -> list[dict]:
+    init_db()
+    with _connect() as connection:
+        rows = connection.execute(
+            """
+            SELECT id, name, description, default_topic, created_at, updated_at
+            FROM courses
+            ORDER BY created_at ASC, name ASC
+            """
+        ).fetchall()
+    return [_row_to_dict(row) for row in rows]
+
+
+def create_course(name: str, description: str = "", default_topic: str = "General review") -> dict:
+    init_db()
+    name = name.strip()
+    if not name:
+        raise ValueError("Course name is required")
+    course_id = f"course-{_slug(name)}-{uuid.uuid4().hex[:6]}"
+    with _connect() as connection:
+        connection.execute(
+            """
+            INSERT INTO courses (id, name, description, default_topic)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                course_id,
+                name,
+                description.strip(),
+                default_topic.strip() or "General review",
+            ),
+        )
+        row = connection.execute(
+            "SELECT id, name, description, default_topic, created_at, updated_at FROM courses WHERE id = ?",
+            (course_id,),
+        ).fetchone()
+    return _row_to_dict(row)
+
+
+def get_course(course_id: str | None = None, name: str | None = None) -> dict | None:
+    init_db()
+    with _connect() as connection:
+        if course_id:
+            row = connection.execute(
+                "SELECT id, name, description, default_topic, created_at, updated_at FROM courses WHERE id = ?",
+                (course_id,),
+            ).fetchone()
+            if row:
+                return _row_to_dict(row)
+        if name:
+            row = connection.execute(
+                "SELECT id, name, description, default_topic, created_at, updated_at FROM courses WHERE name = ?",
+                (name,),
+            ).fetchone()
+            if row:
+                return _row_to_dict(row)
+    return None
+
+
 def upsert_chat_session(
     session_id: str | None,
     course: str,
     topic: str,
     first_message: str,
+    course_id: str | None = None,
 ) -> str:
     init_db()
     title = first_message.strip().replace("\n", " ")[:80] or topic or "New chat"
@@ -103,20 +206,20 @@ def upsert_chat_session(
                 connection.execute(
                     """
                     UPDATE chat_sessions
-                    SET course = ?, topic = ?, updated_at = CURRENT_TIMESTAMP
+                    SET course = ?, topic = ?, course_id = COALESCE(?, course_id), updated_at = CURRENT_TIMESTAMP
                     WHERE id = ?
                     """,
-                    (course, topic, session_id),
+                    (course, topic, course_id, session_id),
                 )
                 return session_id
 
         new_id = uuid.uuid4().hex
         connection.execute(
             """
-            INSERT INTO chat_sessions (id, course, topic, title)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO chat_sessions (id, course, topic, title, course_id)
+            VALUES (?, ?, ?, ?, ?)
             """,
-            (new_id, course, topic, title),
+            (new_id, course, topic, title, course_id),
         )
         return new_id
 
@@ -148,18 +251,30 @@ def add_chat_message(
     return _row_to_dict(row)
 
 
-def list_chat_sessions(limit: int = 30) -> list[dict]:
+def list_chat_sessions(limit: int = 30, course: str | None = None) -> list[dict]:
     init_db()
     with _connect() as connection:
-        rows = connection.execute(
-            """
-            SELECT id, course, topic, title, created_at, updated_at
-            FROM chat_sessions
-            ORDER BY updated_at DESC
-            LIMIT ?
-            """,
-            (limit,),
-        ).fetchall()
+        if course:
+            rows = connection.execute(
+                """
+                SELECT id, course, topic, title, created_at, updated_at, course_id
+                FROM chat_sessions
+                WHERE course = ?
+                ORDER BY updated_at DESC
+                LIMIT ?
+                """,
+                (course, limit),
+            ).fetchall()
+        else:
+            rows = connection.execute(
+                """
+                SELECT id, course, topic, title, created_at, updated_at, course_id
+                FROM chat_sessions
+                ORDER BY updated_at DESC
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
     return [_row_to_dict(row) for row in rows]
 
 
@@ -213,18 +328,30 @@ def update_topic_mastery(course: str, topic: str, mastery: int) -> int:
     return mastery
 
 
-def list_topic_mastery(limit: int = 100) -> list[dict]:
+def list_topic_mastery(limit: int = 100, course: str | None = None) -> list[dict]:
     init_db()
     with _connect() as connection:
-        rows = connection.execute(
-            """
-            SELECT course, topic, mastery, updated_at
-            FROM topic_mastery
-            ORDER BY updated_at DESC
-            LIMIT ?
-            """,
-            (limit,),
-        ).fetchall()
+        if course:
+            rows = connection.execute(
+                """
+                SELECT course, topic, mastery, updated_at, course_id
+                FROM topic_mastery
+                WHERE course = ?
+                ORDER BY updated_at DESC
+                LIMIT ?
+                """,
+                (course, limit),
+            ).fetchall()
+        else:
+            rows = connection.execute(
+                """
+                SELECT course, topic, mastery, updated_at, course_id
+                FROM topic_mastery
+                ORDER BY updated_at DESC
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
     return [_row_to_dict(row) for row in rows]
 
 
@@ -234,6 +361,7 @@ def save_quiz_attempt(
     question: dict,
     answer: str,
     result: dict,
+    course_id: str | None = None,
 ) -> dict:
     init_db()
     attempt_id = uuid.uuid4().hex
@@ -241,8 +369,8 @@ def save_quiz_attempt(
         connection.execute(
             """
             INSERT INTO quiz_attempts
-            (id, course, topic, question_json, answer, result_json, correct, score)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (id, course, topic, question_json, answer, result_json, correct, score, course_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 attempt_id,
@@ -253,6 +381,7 @@ def save_quiz_attempt(
                 _json(result),
                 1 if result.get("correct") else 0,
                 float(result.get("score") or 0),
+                course_id,
             ),
         )
         row = connection.execute(
@@ -262,18 +391,30 @@ def save_quiz_attempt(
     return _row_to_dict(row)
 
 
-def list_quiz_attempts(limit: int = 30) -> list[dict]:
+def list_quiz_attempts(limit: int = 30, course: str | None = None) -> list[dict]:
     init_db()
     with _connect() as connection:
-        rows = connection.execute(
-            """
-            SELECT id, course, topic, correct, score, created_at
-            FROM quiz_attempts
-            ORDER BY created_at DESC
-            LIMIT ?
-            """,
-            (limit,),
-        ).fetchall()
+        if course:
+            rows = connection.execute(
+                """
+                SELECT id, course, topic, correct, score, created_at, course_id
+                FROM quiz_attempts
+                WHERE course = ?
+                ORDER BY created_at DESC
+                LIMIT ?
+                """,
+                (course, limit),
+            ).fetchall()
+        else:
+            rows = connection.execute(
+                """
+                SELECT id, course, topic, correct, score, created_at, course_id
+                FROM quiz_attempts
+                ORDER BY created_at DESC
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
     return [_row_to_dict(row) for row in rows]
 
 
@@ -284,6 +425,7 @@ def save_calendar_event(
     event_type: str,
     due_date: str,
     source: str = "Personal calendar",
+    course_id: str | None = None,
 ) -> dict:
     init_db()
     event_id = uuid.uuid4().hex
@@ -291,8 +433,8 @@ def save_calendar_event(
         connection.execute(
             """
             INSERT INTO calendar_events
-            (id, course, topic, title, event_type, due_date, source)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (id, course, topic, title, event_type, due_date, source, course_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 event_id,
@@ -302,11 +444,12 @@ def save_calendar_event(
                 event_type.strip() or "assignment",
                 due_date.strip(),
                 source.strip() or "Personal calendar",
+                course_id,
             ),
         )
         row = connection.execute(
             """
-            SELECT id, course, topic, title, event_type, due_date, source, created_at, updated_at
+            SELECT id, course, topic, title, event_type, due_date, source, created_at, updated_at, course_id
             FROM calendar_events
             WHERE id = ?
             """,
@@ -315,16 +458,28 @@ def save_calendar_event(
     return _row_to_dict(row)
 
 
-def list_calendar_events(limit: int = 50) -> list[dict]:
+def list_calendar_events(limit: int = 50, course: str | None = None) -> list[dict]:
     init_db()
     with _connect() as connection:
-        rows = connection.execute(
-            """
-            SELECT id, course, topic, title, event_type, due_date, source, created_at, updated_at
-            FROM calendar_events
-            ORDER BY due_date ASC, created_at DESC
-            LIMIT ?
-            """,
-            (limit,),
-        ).fetchall()
+        if course:
+            rows = connection.execute(
+                """
+                SELECT id, course, topic, title, event_type, due_date, source, created_at, updated_at, course_id
+                FROM calendar_events
+                WHERE course = ?
+                ORDER BY due_date ASC, created_at DESC
+                LIMIT ?
+                """,
+                (course, limit),
+            ).fetchall()
+        else:
+            rows = connection.execute(
+                """
+                SELECT id, course, topic, title, event_type, due_date, source, created_at, updated_at, course_id
+                FROM calendar_events
+                ORDER BY due_date ASC, created_at DESC
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
     return [_row_to_dict(row) for row in rows]
