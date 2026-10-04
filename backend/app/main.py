@@ -531,17 +531,20 @@ async def upload_document(
     courseId: str = Form(""),
 ) -> DocumentUploadResponse:
     saved_path = await _save_upload(file)
+    skip_upload_embedding = os.getenv("SKIP_UPLOAD_EMBEDDING", "").strip().lower() in {"1", "true", "yes", "on"}
     try:
         result = await index_document_file(
             file_path=saved_path,
             title=title.strip() or Path(file.filename or saved_path.name).stem,
             keywords=parse_keywords(keywords),
-            embedder=ollama.embed_texts,
-            embedding_model=ollama.embedding_model,
+            embedder=None if skip_upload_embedding else ollama.embed_texts,
+            embedding_model=None if skip_upload_embedding else ollama.embedding_model,
             replace_existing_document=True,
             course=course.strip() or None,
             course_id=courseId.strip() or None,
         )
+        if skip_upload_embedding:
+            result["embeddingError"] = "Embedding skipped for fast Colab upload; lexical retrieval is active."
     except OllamaError as exc:
         raise HTTPException(status_code=503, detail=f"Embedding model unavailable: {exc}") from exc
     except Exception as exc:
