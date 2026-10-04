@@ -324,17 +324,17 @@ def _fallback_practice_response(
         question_type = _fallback_question_type(request, index)
         keywords = _keywords_from_text(sentence, topic)
         explanation = (
-            f"Generated from {source.title}, page {source.page}. "
-            f"Fallback was used because the model response was not usable ({reason})."
+            f"Câu hỏi được tạo từ {source.title}, trang {source.page}. "
+            f"Hệ thống dùng chế độ dự phòng vì model tạo quiz chưa trả về định dạng hợp lệ ({reason})."
         )
 
         if question_type == "multiple_choice":
             correct = sentence
             choices = [
                 correct,
-                f"{topic} is unrelated to the selected course material.",
-                "The uploaded material does not contain any usable learning content.",
-                "The best answer is to ignore the source and use outside knowledge.",
+                f"{topic} không liên quan đến nội dung tài liệu đã chọn.",
+                "Tài liệu đã tải lên không có nội dung học tập nào có thể sử dụng.",
+                "Câu trả lời tốt nhất là bỏ qua tài liệu nguồn và dùng kiến thức bên ngoài.",
             ]
             shift = index % len(choices)
             choices = choices[shift:] + choices[:shift]
@@ -345,8 +345,8 @@ def _fallback_practice_response(
                     level=level,
                     topic=topic,
                     question=(
-                        f"Which statement is supported by {source.title}"
-                        f"{f', page {source.page}' if source.page else ''}?"
+                        f"Nhận định nào được tài liệu {source.title}"
+                        f"{f', trang {source.page}' if source.page else ''} hỗ trợ?"
                     ),
                     choices=choices,
                     correctAnswer=correct,
@@ -363,8 +363,8 @@ def _fallback_practice_response(
                     level=level,
                     topic=topic,
                     question=(
-                        f"Explain the key idea about '{topic}' from {source.title}"
-                        f"{f', page {source.page}' if source.page else ''}."
+                        f"Giải thích ý chính về '{topic}' dựa trên {source.title}"
+                        f"{f', trang {source.page}' if source.page else ''}."
                     ),
                     choices=[],
                     correctAnswer=sentence,

@@ -38,6 +38,10 @@ async function readApiResponse(response) {
   }
 }
 
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -1227,6 +1231,29 @@ document.querySelector("#chat-form").addEventListener("submit", async (event) =>
 
 
 const uploadForm = document.querySelector("#document-upload-form");
+async function waitForDocumentIndex(jobId, uploadStatus) {
+  for (let attempt = 0; attempt < 240; attempt += 1) {
+    const response = await fetch(`${API_BASE}/api/documents/jobs/${encodeURIComponent(jobId)}`);
+    const data = await readApiResponse(response);
+    if (!response.ok) throw new Error(data.detail || `Backend returned ${response.status}`);
+
+    const job = data;
+    if (uploadStatus) {
+      const doc = job.document || {};
+      const chunks = Number(doc.chunksWritten || 0);
+      const embedded = Number(doc.embeddedChunks || 0);
+      uploadStatus.textContent = job.status === "running"
+        ? `Indexing in background... ${chunks} chunks, ${embedded} embedded.`
+        : job.message || `Indexing status: ${job.status}`;
+    }
+
+    if (job.status === "complete") return job.document;
+    if (job.status === "failed") throw new Error(job.message || job.error || "Document indexing failed");
+    await wait(3000);
+  }
+  throw new Error("Indexing is still running. Refresh the page in a moment.");
+}
+
 if (uploadForm) {
   uploadForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -1253,7 +1280,10 @@ if (uploadForm) {
       const data = await readApiResponse(response);
       if (!response.ok) throw new Error(data.detail || `Backend returned ${response.status}`);
 
-      const doc = data.document;
+      if (data.status === "queued" && data.jobId) {
+        uploadStatus.textContent = "Uploaded. Indexing and embedding in the background...";
+      }
+      const doc = data.jobId ? await waitForDocumentIndex(data.jobId, uploadStatus) : data.document;
       if (!Number(doc.chunksWritten || 0)) {
         throw new Error("No chunks were indexed. Remove keywords or use broader keywords, then upload again.");
       }

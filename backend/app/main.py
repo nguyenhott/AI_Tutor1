@@ -1,6 +1,7 @@
 ﻿import re
 import os
 import json
+from uuid import uuid4
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlencode
@@ -8,7 +9,7 @@ from urllib.parse import urlencode
 import httpx
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 from pydantic import BaseModel, Field
@@ -72,6 +73,7 @@ app.add_middleware(
 
 ollama = OllamaClient()
 GOOGLE_TOKEN_PATH = Path(__file__).resolve().parents[1] / "data" / "google_calendar_token.json"
+INDEX_JOBS: dict[str, dict] = {}
 
 
 class ChatRequest(BaseModel):
@@ -94,6 +96,8 @@ class DocumentUploadResponse(BaseModel):
     status: str
     document: dict
     rag: dict
+    jobId: str | None = None
+    message: str = ""
 
 
 class DocumentDeleteResponse(BaseModel):
@@ -207,6 +211,45 @@ async def _save_upload(file: UploadFile) -> Path:
         raise HTTPException(status_code=400, detail="Uploaded file is empty")
     destination.write_bytes(content)
     return destination
+
+
+async def _run_document_index_job(
+    job_id: str,
+    saved_path: Path,
+    title: str,
+    keywords: list[str],
+    course: str | None,
+    course_id: str | None,
+) -> None:
+    INDEX_JOBS[job_id].update({"status": "running", "message": "Indexing and embedding document..."})
+    try:
+        result = await index_document_file(
+            file_path=saved_path,
+            title=title,
+            keywords=keywords,
+            embedder=ollama.embed_texts,
+            embedding_model=ollama.embedding_model,
+            replace_existing_document=True,
+            course=course,
+            course_id=course_id,
+        )
+        INDEX_JOBS[job_id].update(
+            {
+                "status": "complete",
+                "message": "Document indexed and embedded.",
+                "document": result,
+                "rag": rag_status(),
+            }
+        )
+    except Exception as exc:
+        INDEX_JOBS[job_id].update(
+            {
+                "status": "failed",
+                "message": f"Document indexing failed: {exc}",
+                "error": str(exc),
+                "rag": rag_status(),
+            }
+        )
 
 
 def _public_base_url(request: Request) -> str:
@@ -524,6 +567,7 @@ async def remove_document(document_id: str) -> DocumentDeleteResponse:
 
 @app.post("/api/documents/upload", response_model=DocumentUploadResponse)
 async def upload_document(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     title: str = Form(""),
     keywords: str = Form(""),
@@ -531,25 +575,45 @@ async def upload_document(
     courseId: str = Form(""),
 ) -> DocumentUploadResponse:
     saved_path = await _save_upload(file)
-    skip_upload_embedding = os.getenv("SKIP_UPLOAD_EMBEDDING", "").strip().lower() in {"1", "true", "yes", "on"}
-    try:
-        result = await index_document_file(
-            file_path=saved_path,
-            title=title.strip() or Path(file.filename or saved_path.name).stem,
-            keywords=parse_keywords(keywords),
-            embedder=None if skip_upload_embedding else ollama.embed_texts,
-            embedding_model=None if skip_upload_embedding else ollama.embedding_model,
-            replace_existing_document=True,
-            course=course.strip() or None,
-            course_id=courseId.strip() or None,
-        )
-        if skip_upload_embedding:
-            result["embeddingError"] = "Embedding skipped for fast Colab upload; lexical retrieval is active."
-    except OllamaError as exc:
-        raise HTTPException(status_code=503, detail=f"Embedding model unavailable: {exc}") from exc
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Document indexing failed: {exc}") from exc
-    return DocumentUploadResponse(status="ok", document=result, rag=rag_status())
+    job_id = f"job-{uuid4().hex[:12]}"
+    document_title = title.strip() or Path(file.filename or saved_path.name).stem
+    INDEX_JOBS[job_id] = {
+        "status": "queued",
+        "message": "Document uploaded. Indexing will continue in the background.",
+        "document": {
+            "title": document_title,
+            "sourcePath": str(saved_path),
+            "course": course.strip(),
+            "courseId": courseId.strip(),
+            "chunksWritten": 0,
+            "embeddedChunks": 0,
+        },
+        "rag": rag_status(),
+    }
+    background_tasks.add_task(
+        _run_document_index_job,
+        job_id,
+        saved_path,
+        document_title,
+        parse_keywords(keywords),
+        course.strip() or None,
+        courseId.strip() or None,
+    )
+    return DocumentUploadResponse(
+        status="queued",
+        jobId=job_id,
+        document=INDEX_JOBS[job_id]["document"],
+        rag=INDEX_JOBS[job_id]["rag"],
+        message=INDEX_JOBS[job_id]["message"],
+    )
+
+
+@app.get("/api/documents/jobs/{job_id}")
+async def get_document_job(job_id: str) -> dict:
+    job = INDEX_JOBS.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Indexing job not found")
+    return {"status": "ok", "jobId": job_id, **job}
 
 
 @app.post("/api/practice/recommend", response_model=PracticeResponse)
