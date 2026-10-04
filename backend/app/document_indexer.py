@@ -236,6 +236,15 @@ async def index_document_file(
     pages, skipped_pages = extract_pages(file_path)
     kept_pages = [page for page in pages if should_keep_page(page["text"], keywords)]
 
+    if not pages:
+        raise ValueError(
+            "No readable text was found in this file. If this is a scanned PDF, OCR is required before upload."
+        )
+    if not kept_pages:
+        raise ValueError(
+            "No pages matched the provided keywords. Remove the keywords or use broader terms from the document."
+        )
+
     chunks: list[dict] = []
     for page in kept_pages:
         for chunk_index, content in enumerate(chunk_text(page["text"]), start=1):
@@ -252,6 +261,9 @@ async def index_document_file(
                     "embedding": None,
                 }
             )
+
+    if not chunks:
+        raise ValueError("No text chunks were generated from the selected pages.")
 
     embedding_error = None
     if chunks and embedder is not None:

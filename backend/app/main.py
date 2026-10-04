@@ -531,16 +531,21 @@ async def upload_document(
     courseId: str = Form(""),
 ) -> DocumentUploadResponse:
     saved_path = await _save_upload(file)
-    result = await index_document_file(
-        file_path=saved_path,
-        title=title.strip() or Path(file.filename or saved_path.name).stem,
-        keywords=parse_keywords(keywords),
-        embedder=ollama.embed_texts,
-        embedding_model=ollama.embedding_model,
-        replace_existing_document=True,
-        course=course.strip() or None,
-        course_id=courseId.strip() or None,
-    )
+    try:
+        result = await index_document_file(
+            file_path=saved_path,
+            title=title.strip() or Path(file.filename or saved_path.name).stem,
+            keywords=parse_keywords(keywords),
+            embedder=ollama.embed_texts,
+            embedding_model=ollama.embedding_model,
+            replace_existing_document=True,
+            course=course.strip() or None,
+            course_id=courseId.strip() or None,
+        )
+    except OllamaError as exc:
+        raise HTTPException(status_code=503, detail=f"Embedding model unavailable: {exc}") from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Document indexing failed: {exc}") from exc
     return DocumentUploadResponse(status="ok", document=result, rag=rag_status())
 
 

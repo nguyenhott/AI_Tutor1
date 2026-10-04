@@ -28,6 +28,16 @@ async function fetchJson(path) {
   return data;
 }
 
+async function readApiResponse(response) {
+  const text = await response.text();
+  try {
+    return text ? JSON.parse(text) : {};
+  } catch (error) {
+    const preview = text.replace(/\s+/g, " ").slice(0, 180);
+    throw new Error(`Backend returned non-JSON response (${response.status}). ${preview}`);
+  }
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -1240,10 +1250,13 @@ if (uploadForm) {
         method: "POST",
         body: formData
       });
-      const data = await response.json();
+      const data = await readApiResponse(response);
       if (!response.ok) throw new Error(data.detail || `Backend returned ${response.status}`);
 
       const doc = data.document;
+      if (!Number(doc.chunksWritten || 0)) {
+        throw new Error("No chunks were indexed. Remove keywords or use broader keywords, then upload again.");
+      }
       const warning = doc.embeddingError ? " Embedding failed, using lexical fallback." : "";
       uploadStatus.textContent = `Indexed ${doc.chunksWritten} chunks, embedded ${doc.embeddedChunks}.${warning}`;
       uploadForm.reset();
