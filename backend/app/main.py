@@ -141,6 +141,9 @@ def build_messages(request: ChatRequest, sources: list[Source]) -> list[dict]:
         "Do not handle document upload, do not grade quiz answers, and do not claim that you changed stored data. "
         "Final answer only; do not show reasoning or hidden analysis. "
         "Write in Vietnamese as one concise tutoring response with at most 4 short sentences. "
+        "Use standard Vietnamese only. Never use Chinese, Japanese, Korean, Han characters, or mixed-language fragments. "
+        "For C programming, translate pointer as 'con trỏ', address as 'địa chỉ', and dereference as 'truy cập giá trị qua con trỏ'. "
+        "If a term sounds unnatural in Vietnamese, keep the English technical term in parentheses. "
         "Use only the provided SOURCES for course-specific facts; if the sources are not enough, say the course material is not enough. "
         f"When using a source, cite it exactly with one of these ids: {source_ids}. "
         "Do not invent facts, citations, page numbers, formulas, or source ids."
@@ -158,6 +161,8 @@ QUESTION:
 
 RESPONSE REQUIREMENTS:
 - Answer in Vietnamese.
+- Use clear Vietnamese or English technical terms only. Do not mix in Chinese/Japanese/Korean/Han characters.
+- For C programming: pointer = con trỏ, address = địa chỉ, dereference = truy cập giá trị qua con trỏ.
 - Keep it very concise, at most 4 short sentences. Do not include your reasoning process.
 - Cite sources with ids shown in SOURCES, for example [S1] or [S2].
 - If the retrieved sources are not enough, say the course material is not enough.

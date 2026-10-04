@@ -1065,7 +1065,7 @@ function tutorReply(input) {
 
 async function askBackendTutor(input, onToken) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 25000);
+  const timeoutId = setTimeout(() => controller.abort(), 90000);
 
   try {
     const response = await fetch(`${API_BASE}/api/chat`, {

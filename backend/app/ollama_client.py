@@ -1,5 +1,6 @@
-﻿import json
+import json
 import os
+import re
 from collections.abc import AsyncIterator
 
 import httpx
@@ -7,6 +8,31 @@ import httpx
 
 class OllamaError(RuntimeError):
     pass
+
+
+_CJK_PATTERN = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
+_THINK_PATTERN = re.compile(r"<think>.*?</think>", flags=re.IGNORECASE | re.DOTALL)
+
+
+def clean_model_output(text: str) -> str:
+    value = str(text or "")
+    value = _THINK_PATTERN.sub("", value)
+    if "</think>" in value.lower():
+        value = re.split(r"</think>", value, flags=re.IGNORECASE)[-1]
+    value = re.sub(r"(?im)^\s*(reasoning|analysis|thought process)\s*:.*$", "", value)
+    value = _CJK_PATTERN.sub("", value)
+    for source, target in {
+        "c\u00e1c chi\u1ebft": "c\u00e1c con tr\u1ecf",
+        "m\u1ed9t chi\u1ebft": "m\u1ed9t con tr\u1ecf",
+        "chi\u1ebft l\u00e0": "con tr\u1ecf l\u00e0",
+        "chi\u1ebft cho": "con tr\u1ecf cho",
+        "chi\u1ebft,": "con tr\u1ecf,",
+        "chi\u1ebft.": "con tr\u1ecf.",
+    }.items():
+        value = value.replace(source, target)
+    value = re.sub(r"[ \t]+", " ", value)
+    value = re.sub(r"\n{3,}", "\n\n", value)
+    return value.strip()
 
 
 class OllamaClient:
@@ -17,6 +43,7 @@ class OllamaClient:
         self.embedding_batch_size = int(os.getenv("OLLAMA_EMBED_BATCH_SIZE", "16"))
         self.num_predict = int(os.getenv("OLLAMA_NUM_PREDICT", "700"))
         self.num_ctx = int(os.getenv("OLLAMA_NUM_CTX", "2048"))
+        self.chat_timeout = float(os.getenv("OLLAMA_CHAT_TIMEOUT", "180"))
 
     async def check_connection(self) -> dict:
         try:
@@ -42,7 +69,7 @@ class OllamaClient:
 
     async def chat(self, messages: list[dict], temperature: float = 0.2) -> str:
         try:
-            async with httpx.AsyncClient(timeout=120) as client:
+            async with httpx.AsyncClient(timeout=self.chat_timeout) as client:
                 response = await client.post(
                     f"{self.base_url}/api/chat",
                     json=self._payload(messages, stream=False, temperature=temperature),
@@ -55,7 +82,7 @@ class OllamaClient:
             raise OllamaError(f"Cannot call Ollama at {self.base_url}") from exc
 
         try:
-            return data["message"]["content"]
+            return clean_model_output(data["message"]["content"])
         except KeyError as exc:
             raise OllamaError("Unexpected Ollama response shape") from exc
 
@@ -110,7 +137,7 @@ class OllamaClient:
                             continue
                         event = json.loads(line)
                         if "message" in event:
-                            yield event["message"].get("content", "")
+                            yield clean_model_output(event["message"].get("content", ""))
                         if event.get("done"):
                             break
         except httpx.HTTPStatusError as exc:
