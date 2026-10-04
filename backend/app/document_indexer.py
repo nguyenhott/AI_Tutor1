@@ -62,6 +62,23 @@ def make_document_id(title: str, file_name: str) -> str:
     return f"doc-{slug or 'document'}-{digest}"
 
 
+async def embed_chunks_in_batches(chunks: list[dict], embedder: Embedder) -> list[str]:
+    errors: list[str] = []
+    batch_size = max(1, int(os.getenv("UPLOAD_EMBED_BATCH_SIZE", os.getenv("OLLAMA_EMBED_BATCH_SIZE", "4"))))
+    for start in range(0, len(chunks), batch_size):
+        batch = chunks[start : start + batch_size]
+        try:
+            embeddings = await embedder([chunk["content"] for chunk in batch])
+            if len(embeddings) != len(batch):
+                raise RuntimeError("Embedding count does not match chunk count")
+            for chunk, embedding in zip(batch, embeddings):
+                chunk["embedding"] = embedding
+        except Exception as exc:
+            errors.append(f"batch {start + 1}-{start + len(batch)}: {exc}")
+            continue
+    return errors
+
+
 def empty_index() -> dict:
     return {"version": 2, "embeddingModel": None, "chunks": []}
 
@@ -267,14 +284,13 @@ async def index_document_file(
 
     embedding_error = None
     if chunks and embedder is not None:
-        try:
-            embeddings = await embedder([chunk["content"] for chunk in chunks])
-            if len(embeddings) != len(chunks):
-                raise RuntimeError("Embedding count does not match chunk count")
-            for chunk, embedding in zip(chunks, embeddings):
-                chunk["embedding"] = embedding
-        except Exception as exc:
-            embedding_error = str(exc)
+        errors = await embed_chunks_in_batches(chunks, embedder)
+        if errors:
+            embedded_count = sum(1 for chunk in chunks if chunk.get("embedding"))
+            embedding_error = (
+                f"{embedded_count}/{len(chunks)} chunks embedded. "
+                f"{len(errors)} embedding batches failed. First error: {errors[0]}"
+            )
 
     index = load_index()
     if replace_existing_document:

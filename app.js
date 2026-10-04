@@ -1287,7 +1287,7 @@ if (uploadForm) {
       if (!Number(doc.chunksWritten || 0)) {
         throw new Error("No chunks were indexed. Remove keywords or use broader keywords, then upload again.");
       }
-      const warning = doc.embeddingError ? " Embedding failed, using lexical fallback." : "";
+      const warning = doc.embeddingError ? ` Embedding issue: ${doc.embeddingError}` : "";
       uploadStatus.textContent = `Indexed ${doc.chunksWritten} chunks, embedded ${doc.embeddedChunks}.${warning}`;
       uploadForm.reset();
       await refreshRagStatus();
