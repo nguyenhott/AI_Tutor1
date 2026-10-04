@@ -265,6 +265,56 @@ function formatShortDate(value) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+function getValidDate(value, fallback = new Date()) {
+  const date = value ? new Date(value) : null;
+  return date && !Number.isNaN(date.getTime()) ? date : new Date(fallback);
+}
+
+function startOfWeek(date) {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - start.getDay());
+  return start;
+}
+
+function addDays(date, days) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function sameDate(left, right) {
+  return left.getFullYear() === right.getFullYear()
+    && left.getMonth() === right.getMonth()
+    && left.getDate() === right.getDate();
+}
+
+function monthTitle(date) {
+  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+}
+
+function renderMiniCalendar(baseDate) {
+  const grid = document.querySelector("#mini-calendar-grid");
+  const label = document.querySelector("#mini-calendar-month");
+  if (!grid) return;
+  if (label) label.textContent = monthTitle(baseDate);
+
+  const monthStart = new Date(baseDate.getFullYear(), baseDate.getMonth(), 1);
+  const firstCell = startOfWeek(monthStart);
+  const today = new Date();
+  const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
+  const cells = weekdays.map((day) => `<span class="mini-weekday">${day}</span>`);
+  for (let index = 0; index < 42; index += 1) {
+    const date = addDays(firstCell, index);
+    const classes = [
+      date.getMonth() !== baseDate.getMonth() ? "muted" : "",
+      sameDate(date, today) ? "active" : ""
+    ].filter(Boolean).join(" ");
+    cells.push(`<span class="${classes}">${date.getDate()}</span>`);
+  }
+  grid.innerHTML = cells.join("");
+}
+
 function percentFromScore(score) {
   const numeric = Number(score || 0);
   return Math.round(numeric <= 1 ? numeric * 100 : numeric);
@@ -459,32 +509,66 @@ function renderStudyPlan(plan) {
     rationale.textContent = plan.rationale || "The plan prioritizes weak topics first, then upcoming deadlines.";
   }
 
-  const days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-  const byDay = new Map(days.map((day) => [day, []]));
-  plan.items.slice(0, 8).forEach((item, index) => {
-    const day = item.day || days[index % days.length];
-    if (!byDay.has(day)) byDay.set(day, []);
-    byDay.get(day).push(item);
+  const firstItemDate = plan.items.find((item) => item.date)?.date;
+  const anchorDate = getValidDate(firstItemDate, new Date());
+  const weekStart = startOfWeek(anchorDate);
+  const weekDates = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
+  const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+  const hours = Array.from({ length: 14 }, (_, index) => index + 7);
+  const today = new Date();
+  const dayBuckets = weekDates.map(() => []);
+
+  plan.items.slice(0, 14).forEach((item, index) => {
+    const itemDate = item.date ? getValidDate(item.date, addDays(weekStart, index % 7)) : null;
+    let dayIndex = itemDate ? weekDates.findIndex((date) => sameDate(date, itemDate)) : -1;
+    if (dayIndex < 0 && item.day) dayIndex = weekDays.indexOf(String(item.day).slice(0, 3).toUpperCase());
+    if (dayIndex < 0) dayIndex = index % 7;
+    const slot = 8 + (dayBuckets[dayIndex].length * 1.35);
+    dayBuckets[dayIndex].push({ ...item, slot });
   });
 
-  grid.classList.add("calendar-board");
-  grid.innerHTML = [...byDay.entries()].map(([day, items]) => `
-    <article class="calendar-day">
-      <header><strong>${escapeHtml(day)}</strong><small>${escapeHtml(formatShortDate(items[0]?.date) || "Open")}</small></header>
-      ${items.length ? items.map((item) => {
+  const rangeTitle = document.querySelector("#calendar-range-title");
+  if (rangeTitle) rangeTitle.textContent = monthTitle(weekStart);
+  renderMiniCalendar(anchorDate);
+
+  const head = `
+    <div class="calendar-week-head">
+      <div class="timezone-cell">GMT+7</div>
+      ${weekDates.map((date, index) => `
+        <div class="calendar-day-head ${sameDate(date, today) ? "today" : ""}">
+          <div><small>${weekDays[index]}</small><strong>${date.getDate()}</strong></div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  const labels = `<div class="calendar-time-labels">${hours.map((hour) => {
+    const display = hour === 12 ? "12 PM" : hour > 12 ? `${hour - 12} PM` : `${hour} AM`;
+    return `<div class="calendar-hour-label">${display}</div>`;
+  }).join("")}</div>`;
+
+  const columns = dayBuckets.map((items) => `
+    <div class="calendar-day-column">
+      ${items.map((item) => {
         const priority = item.priority === "High";
+        const review = item.activity && String(item.activity).toLowerCase().includes("review");
         const deadline = item.deadline ? `${item.deadline.title} due ${item.deadline.dueDate}` : item.reason;
+        const minutes = Math.max(25, Number(item.minutes || 35));
+        const top = Math.max(0, (Number(item.slot || 8) - 7) * 60);
+        const height = Math.min(110, Math.max(46, minutes * 1.25));
         return `
-          <div class="calendar-event ${priority ? "priority" : ""}">
-            <span>${Number(item.minutes || 25)} min</span>
+          <div class="calendar-event ${priority ? "priority" : review ? "review" : ""}" style="top:${top}px;height:${height}px">
+            <span>${minutes} min</span>
             <strong>${escapeHtml(item.topic)}</strong>
             <small>${escapeHtml(item.course)}</small>
-            <small>${escapeHtml(item.activity)}. ${escapeHtml(deadline || "")}</small>
+            <small>${escapeHtml(item.activity)}${deadline ? ` - ${escapeHtml(deadline)}` : ""}</small>
           </div>
         `;
-      }).join("") : `<div class="calendar-event"><strong>Open review slot</strong><small>No priority item scheduled.</small></div>`}
-    </article>
+      }).join("")}
+    </div>
   `).join("");
+
+  grid.innerHTML = `${head}<div class="calendar-time-grid">${labels}${columns}</div>`;
 }
 
 function renderCalendarEvents(events = []) {
@@ -824,6 +908,10 @@ document.querySelector("#go-practice")?.addEventListener("click", async () => {
   renderPracticeIdle();
 });
 document.querySelector("#go-study-plan")?.addEventListener("click", () => showView("plan"));
+document.querySelector("#focus-calendar-title")?.addEventListener("click", () => {
+  showView("plan");
+  document.querySelector("#calendar-title")?.focus();
+});
 document.querySelector("#generate-practice").addEventListener("click", loadPracticeQuestions);
 document.querySelector("#practice-document").addEventListener("change", (event) => {
   const documentId = event.target.value;

@@ -318,10 +318,16 @@
       </section>
 
       <section class="view" id="plan">
-        <div class="section-intro"><p class="eyebrow">CURRICULUM PLANNER AGENT</p><h2>Study plan for the selected course</h2><p id="study-plan-summary">Generated from weak topics, deadlines, and 4.5 available study hours.</p></div>
-        <div class="content-grid plan-tools">
-          <article class="panel">
-            <div class="panel-heading"><div><p class="eyebrow">PERSONAL CALENDAR</p><h2>Add exam or assignment</h2></div><span class="chip">Student schedule</span></div>
+        <div class="calendar-shell">
+          <aside class="calendar-sidebar">
+            <button class="calendar-create" type="button" id="focus-calendar-title"><span>+</span>Create</button>
+            <div class="mini-calendar">
+              <div class="mini-calendar-top">
+                <strong id="mini-calendar-month">October 2026</strong>
+                <span>‹ ›</span>
+              </div>
+              <div class="mini-calendar-grid" id="mini-calendar-grid"></div>
+            </div>
             <form class="calendar-form" id="calendar-event-form">
               <label>
                 Course
@@ -351,27 +357,29 @@
               <button class="secondary full" type="submit">Add to calendar</button>
               <small id="calendar-status">Add your schedule so alerts and study plan can prioritize upcoming exams.</small>
             </form>
-          </article>
-          <article class="panel">
-            <div class="panel-heading"><div><p class="eyebrow">UPCOMING</p><h2>Calendar events</h2></div></div>
-            <div class="source-card google-calendar-card">
+            <div class="calendar-source-block">
               <strong>Google Calendar</strong>
               <small id="google-calendar-status">Connect requires Google Cloud OAuth credentials.</small>
               <button class="secondary full" id="connect-google-calendar" type="button">Connect Google Calendar</button>
               <button class="secondary full" id="sync-google-calendar" type="button">Sync Google Calendar</button>
             </div>
-            <div id="calendar-events">
-              <div class="source-card"><strong>No personal calendar yet</strong><small>Add an exam or assignment to personalize the plan.</small></div>
+            <div class="calendar-source-block" id="calendar-events">
+              <strong>No personal calendar yet</strong>
+              <small>Add an exam or assignment to personalize the plan.</small>
             </div>
-          </article>
+          </aside>
+          <section class="calendar-main">
+            <header class="calendar-toolbar">
+              <button class="calendar-today" type="button">Today</button>
+              <div class="calendar-nav-buttons"><button type="button">‹</button><button type="button">›</button></div>
+              <h2 id="calendar-range-title">October 2026</h2>
+              <div class="calendar-mode">Week</div>
+            </header>
+            <p class="calendar-plan-summary" id="study-plan-summary">Generated from weak topics, deadlines, and 4.5 available study hours.</p>
+            <div class="google-week-calendar" id="study-plan-grid"></div>
+            <article class="calendar-rationale"><p id="study-plan-rationale">The plan prioritizes weak topics first, then upcoming deadlines.</p></article>
+          </section>
         </div>
-        <div class="week-grid" id="study-plan-grid">
-          <article class="day-card priority"><p>MON - JUN 08</p><h3>Integration by parts</h3><span>35 min - Calculus II</span><div class="tag">Priority: High</div><small>Review concept -> 2 worked examples -> 5-question quiz</small></article>
-          <article class="day-card"><p>TUE - JUN 09</p><h3>Binary search trees</h3><span>30 min - Data Structures</span><div class="tag">Practice</div><small>Traversal recap -> adaptive coding questions</small></article>
-          <article class="day-card"><p>WED - JUN 10</p><h3>Normalization</h3><span>45 min - Databases</span><div class="tag">Exam prep</div><small>Functional dependencies -> 3NF exercises</small></article>
-          <article class="day-card"><p>THU - JUN 11</p><h3>Mixed review</h3><span>25 min - Calculus II</span><div class="tag">Reinforce</div><small>Spaced review based on Monday's quiz result</small></article>
-        </div>
-        <article class="panel rationale"><p class="eyebrow">WHY THIS PLAN?</p><p id="study-plan-rationale"><strong>Calculus receives first priority</strong> because the topic score fell below 60% and an assignment is due in two days. Database review is scheduled before the midterm, while strong Data Structures results require only maintenance practice.</p></article>
       </section>
     </main>
   </div>
